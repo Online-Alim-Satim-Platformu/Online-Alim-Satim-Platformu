@@ -1,1 +1,1 @@
-# Online-Al-m-Sat-m-Platformu
+# Online Alim Satim Platformu
