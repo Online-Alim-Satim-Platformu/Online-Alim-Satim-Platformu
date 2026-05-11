@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDir>
 #include <QDateTime>
 
@@ -12,7 +13,9 @@ IlanEkle::IlanEkle(QWidget *parent) : QWidget(parent), ui(new Ui::IlanEkle) {
     secilenFotoYolu = "";
 }
 
-IlanEkle::~IlanEkle() { delete ui; }
+IlanEkle::~IlanEkle() {
+    delete ui;
+}
 
 void IlanEkle::on_btnFotoEkle_clicked() {
     QString dosya = QFileDialog::getOpenFileName(this, "Fotoğraf Seç", "", "Resimler (*.png *.jpg *.jpeg)");
@@ -26,11 +29,22 @@ void IlanEkle::on_btnYayinla_clicked() {
     QString baslik = ui->txtBaslik->text();
     double fiyat = ui->txtFiyat->text().toDouble();
 
+    // Boşluk ve fiyat kontrolü
     if (baslik.isEmpty() || fiyat <= 0) {
-        QMessageBox::warning(this, "Hata", "Başlık ve geçerli bir fiyat giriniz!");
+        QMessageBox::warning(this, "Hata", "Lütfen bir başlık ve geçerli bir fiyat giriniz!");
         return;
     }
 
+    // Veritabanı bağlantısını al
+    QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
+    if (!db.isOpen()) {
+        if (!DatabaseManager::getInstance()->baglantiKur()) {
+            QMessageBox::critical(this, "Hata", "Veritabanı bağlantısı kurulamadı!");
+            return;
+        }
+    }
+
+    // Fotoğraf kopyalama işlemleri
     QString kaydedilecekAdres = "";
     if (!secilenFotoYolu.isEmpty()) {
         QString imagesDir = qApp->applicationDirPath() + "/images";
@@ -39,7 +53,8 @@ void IlanEkle::on_btnYayinla_clicked() {
         QFile::copy(secilenFotoYolu, kaydedilecekAdres);
     }
 
-    QSqlQuery query;
+    // Doğru bağlantı üzerinden sorguyu hazırla
+    QSqlQuery query(db);
     query.prepare("INSERT INTO Ilan (baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu) "
                   "VALUES (:b, :f, :k, :a, :s, :foto)");
     query.bindValue(":b", baslik);
@@ -49,10 +64,15 @@ void IlanEkle::on_btnYayinla_clicked() {
     query.bindValue(":s", 1);
     query.bindValue(":foto", kaydedilecekAdres);
 
+    // Sorguyu çalıştır ve sonucu kontrol et
     if (query.exec()) {
-        QMessageBox::information(this, "Başarılı", "İlan yayınlandı!");
-        this->close();
+        QMessageBox::information(this, "Başarılı", "İlan başarıyla yayınlandı!");
+        this->close(); // Pencere kapanınca anasayfa tetiklenip vitrini güncelleyecek
+    } else {
+        QMessageBox::critical(this, "Sorgu Hatası", "İlan kaydedilemedi!\nHata: " + query.lastError().text());
     }
 }
 
-void IlanEkle::on_btnIptal_clicked() { this->close(); }
+void IlanEkle::on_btnIptal_clicked() {
+    this->close();
+}

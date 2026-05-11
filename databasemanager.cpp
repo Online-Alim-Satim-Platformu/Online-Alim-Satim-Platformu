@@ -1,11 +1,14 @@
 #include "databasemanager.h"
+#include <QCoreApplication>
 #include <QDebug>
+#include <QSqlError>
 
 DatabaseManager* DatabaseManager::instance = nullptr;
 
 DatabaseManager::DatabaseManager() {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("online_alisveris.db");
+    QString path = QCoreApplication::applicationDirPath() + "/online_alisveris.db";
+    db.setDatabaseName(path);
 }
 
 DatabaseManager* DatabaseManager::getInstance() {
@@ -16,24 +19,35 @@ DatabaseManager* DatabaseManager::getInstance() {
 }
 
 bool DatabaseManager::baglantiKur() {
-    if (!db.open()) return false;
+    if (!db.open()) {
+        qDebug() << "Hata: Veritabanı açılamadı!" << db.lastError().text();
+        return false;
+    }
 
-    QSqlQuery query;
-    // Kullanıcı Tablosu
+    QSqlQuery query(db);
+
     query.exec("CREATE TABLE IF NOT EXISTS Kullanici ("
                "kullaniciID INTEGER PRIMARY KEY AUTOINCREMENT, "
                "kullaniciAdi TEXT, sifre TEXT, email TEXT UNIQUE, rol TEXT)");
 
-    // İlan Tablosu
     query.exec("CREATE TABLE IF NOT EXISTS Ilan ("
                "ilanNo INTEGER PRIMARY KEY AUTOINCREMENT, "
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
                "stokAdedi INTEGER, fotografYolu TEXT)");
 
-    // Sütun ekleme garantisi (Eski DB'ler için)
-    query.exec("ALTER TABLE Ilan ADD COLUMN fotografYolu TEXT");
+    // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
+    QSqlQuery checkQuery(db);
+    if (checkQuery.exec("SELECT COUNT(*) FROM Kullanici")) {
+        if (checkQuery.next() && checkQuery.value(0).toInt() == 0) {
+            QSqlQuery insertQuery(db);
+            insertQuery.exec("INSERT INTO Kullanici (kullaniciAdi, email, sifre, rol) "
+                             "VALUES ('Berat', 'berat@2sinifpcmüh.com', '1234', 'admin')");
+        }
+    }
 
     return true;
 }
 
-QSqlDatabase DatabaseManager::getDatabase() { return db; }
+QSqlDatabase DatabaseManager::getDatabase() {
+    return db;
+}

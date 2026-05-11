@@ -15,7 +15,8 @@ SOURCES += \
     ilanekle.cpp \
     kayitekrani.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    profil.cpp
 
 HEADERS += \
     anasayfa.h \
@@ -23,14 +24,16 @@ HEADERS += \
     girisekrani.h \
     ilanekle.h \
     kayitekrani.h \
-    mainwindow.h
+    mainwindow.h \
+    profil.h
 
 FORMS += \
     anasayfa.ui \
     girisekrani.ui \
     ilanekle.ui \
     kayitekrani.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    profil.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
