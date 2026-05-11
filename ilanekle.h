@@ -2,14 +2,10 @@
 #define ILANEKLE_H
 
 #include <QWidget>
-#include <QString>
 
-namespace Ui {
-class IlanEkle;
-}
+namespace Ui { class IlanEkle; }
 
-class IlanEkle : public QWidget
-{
+class IlanEkle : public QWidget {
     Q_OBJECT
 
 public:
@@ -18,11 +14,12 @@ public:
 
 private slots:
     void on_btnYayinla_clicked();
-    void on_btnFotoEkle_clicked(); // Yeni fotoğraf butonumuz
+    void on_btnFotoEkle_clicked();
+    void on_btnIptal_clicked();
 
 private:
     Ui::IlanEkle *ui;
-    QString secilenFotoYolu; // Fotoğraf seçildiğinde adresini burada tutacağız
+    QString secilenFotoYolu;
 };
 
 #endif // ILANEKLE_H

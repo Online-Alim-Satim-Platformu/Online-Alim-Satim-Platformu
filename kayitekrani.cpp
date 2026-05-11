@@ -5,7 +5,10 @@
 #include <QMessageBox>
 #include <QSqlQuery>
 
-KayitEkrani::KayitEkrani(QWidget *parent) : QWidget(parent), ui(new Ui::KayitEkrani) {
+KayitEkrani::KayitEkrani(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::KayitEkrani)
+{
     ui->setupUi(this);
 }
 
@@ -24,22 +27,23 @@ void KayitEkrani::on_btnHesapAc_clicked() {
         return;
     }
 
-    QString kullaniciAdi = ad + " " + soyad;
+    // Değişken tanımlama hatasını burada düzelttik
+    QString tamAd = ad + " " + soyad;
 
     QSqlQuery query;
     query.prepare("INSERT INTO Kullanici (kullaniciAdi, sifre, email, rol) VALUES (:ad, :sifre, :email, :rol)");
-    query.bindValue(":ad", kullaniciAdi);
+    query.bindValue(":ad", tamAd);
     query.bindValue(":sifre", sifre);
     query.bindValue(":email", email);
     query.bindValue(":rol", "Alici");
 
     if (query.exec()) {
-        QMessageBox::information(this, "Başarılı", "Kayıt işlemi tamamlandı! Giriş yapabilirsiniz.");
+        QMessageBox::information(this, "Başarılı", "Kayıt işlemi tamamlandı!");
         GirisEkrani *giris = new GirisEkrani();
         giris->show();
         this->close();
     } else {
-        QMessageBox::critical(this, "Hata", "Kayıt yapılamadı! Bu e-posta kullanımda olabilir.");
+        QMessageBox::critical(this, "Hata", "Kayıt yapılamadı!");
     }
 }
 

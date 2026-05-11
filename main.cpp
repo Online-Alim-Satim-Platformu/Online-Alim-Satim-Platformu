@@ -2,14 +2,14 @@
 #include "databasemanager.h"
 #include <QApplication>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    // Veritabanı bağlantısını başlat
-    DatabaseManager::getInstance()->baglantiKur();
+    // Veritabanını aç
+    if(!DatabaseManager::getInstance()->baglantiKur()){
+        return -1;
+    }
 
-    // Giriş ekranını göster
     GirisEkrani w;
     w.show();
 

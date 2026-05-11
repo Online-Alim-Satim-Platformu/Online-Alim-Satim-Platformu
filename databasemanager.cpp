@@ -1,6 +1,5 @@
 #include "databasemanager.h"
 #include <QDebug>
-#include <QSqlError>
 
 DatabaseManager* DatabaseManager::instance = nullptr;
 
@@ -23,26 +22,18 @@ bool DatabaseManager::baglantiKur() {
     // Kullanıcı Tablosu
     query.exec("CREATE TABLE IF NOT EXISTS Kullanici ("
                "kullaniciID INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "kullaniciAdi TEXT, "
-               "sifre TEXT, "
-               "email TEXT UNIQUE, "
-               "rol TEXT)");
+               "kullaniciAdi TEXT, sifre TEXT, email TEXT UNIQUE, rol TEXT)");
 
     // İlan Tablosu
     query.exec("CREATE TABLE IF NOT EXISTS Ilan ("
                "ilanNo INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "baslik TEXT, "
-               "fiyat REAL, "
-               "kategori TEXT, "
-               "aciklama TEXT, "
-               "stokAdedi INTEGER)");
+               "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
+               "stokAdedi INTEGER, fotografYolu TEXT)");
 
-    // Fotoğraf sütununu ekler (varsa hata vermez, atlar)
+    // Sütun ekleme garantisi (Eski DB'ler için)
     query.exec("ALTER TABLE Ilan ADD COLUMN fotografYolu TEXT");
 
     return true;
 }
 
-QSqlDatabase DatabaseManager::getDatabase() {
-    return db;
-}
+QSqlDatabase DatabaseManager::getDatabase() { return db; }
