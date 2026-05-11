@@ -1,4 +1,4 @@
-QT       += core gui
+QT += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,16 +9,24 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    anasayfa.cpp \
+    databasemanager.cpp \
     girisekrani.cpp \
+    kayitekrani.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    anasayfa.h \
+    databasemanager.h \
     girisekrani.h \
+    kayitekrani.h \
     mainwindow.h
 
 FORMS += \
+    anasayfa.ui \
     girisekrani.ui \
+    kayitekrani.ui \
     mainwindow.ui
 
 # Default rules for deployment.

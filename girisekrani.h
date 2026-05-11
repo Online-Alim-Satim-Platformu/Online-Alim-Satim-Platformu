@@ -15,6 +15,10 @@ public:
     explicit GirisEkrani(QWidget *parent = nullptr);
     ~GirisEkrani();
 
+private slots:
+    void on_btnHesapAc_clicked();
+    void on_btnGirisYap_clicked(); // Giriş yap butonu için ekledik
+
 private:
     Ui::GirisEkrani *ui;
 };
