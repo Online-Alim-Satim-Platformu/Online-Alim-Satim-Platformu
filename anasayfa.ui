@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>710</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,14 +43,14 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string>color: #0078D7; background-color: white; padding: 5px; border-radius: 15px;</string>
+        <string notr="true">color: #4B5563; background-color: white; padding: 5px; border-radius: 15px;</string>
        </property>
        <property name="text">
         <string>Online
 Alım Satım</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -78,6 +78,22 @@ Alım Satım</string>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #4B5563;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
+       </property>
        <property name="text">
         <string>Profilim</string>
        </property>
@@ -103,7 +119,20 @@ Alım Satım</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
-        <string>background-color: #607D8B; color: white; border-radius: 5px;</string>
+        <string notr="true">QPushButton {
+    background-color: #F97316;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
        </property>
        <property name="text">
         <string>İlan Ver</string>
@@ -115,7 +144,7 @@ Alım Satım</string>
    <item>
     <widget class="Line" name="line">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -145,6 +174,22 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+    background-color: #F97316;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
+          </property>
           <property name="text">
            <string>Emlak</string>
           </property>
@@ -154,6 +199,22 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
          <widget class="QPushButton" name="btnVasita">
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+    background-color: #F97316;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
           </property>
           <property name="text">
            <string>Vasıta</string>
@@ -165,6 +226,22 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+    background-color: #F97316;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
+          </property>
           <property name="text">
            <string>Elektronik</string>
           </property>
@@ -175,6 +252,22 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+    background-color: #F97316;
+    color: white; 
+    font-weight: bold; 
+    border: none;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+}
+QPushButton:hover {
+    background-color: #EA580C;
+}
+QPushButton:pressed {
+    background-color: #C2410C;
+}</string>
+          </property>
           <property name="text">
            <string>Giyim</string>
           </property>
@@ -183,7 +276,10 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
         <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -216,7 +312,7 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -231,14 +327,14 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
+           <property name="styleSheet">
+            <string notr="true">color: #EA580C;</string>
+           </property>
            <property name="text">
             <string>Tüm vitrin ilanlarını göster</string>
            </property>
            <property name="flat">
             <bool>true</bool>
-           </property>
-           <property name="styleSheet">
-            <string>color: #0078D7;</string>
            </property>
           </widget>
          </item>
@@ -249,14 +345,14 @@ QPushButton:hover { background-color: #0078D7; color: white; }</string>
          <property name="styleSheet">
           <string>background-color: #ffffff; border: 1px solid #dcdcdc; border-radius: 5px;</string>
          </property>
-         <property name="viewMode">
-          <enum>QListView::IconMode</enum>
-         </property>
          <property name="resizeMode">
-          <enum>QListView::Adjust</enum>
+          <enum>QListView::ResizeMode::Adjust</enum>
          </property>
          <property name="spacing">
           <number>15</number>
+         </property>
+         <property name="viewMode">
+          <enum>QListView::ViewMode::IconMode</enum>
          </property>
         </widget>
        </item>
