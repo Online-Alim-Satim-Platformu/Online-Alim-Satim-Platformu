@@ -63,6 +63,19 @@
      <string>Kayıt Ol</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>150</y>
+      <width>93</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Deneme</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -70,7 +83,7 @@
      <x>0</x>
      <y>0</y>
      <width>1243</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
