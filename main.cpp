@@ -1,11 +1,13 @@
-#include "mainwindow.h"
-
+#include "girisekrani.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+
+    // Proje başladığında ekranda gösterilecek ilk sınıfımız:
+    GirisEkrani w;
     w.show();
+
     return a.exec();
 }

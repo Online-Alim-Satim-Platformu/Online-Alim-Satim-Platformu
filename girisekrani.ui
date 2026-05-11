@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GirisEkrani</class>
+ <widget class="QWidget" name="GirisEkrani">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Giriş Yap - Online Alışveriş Platformu</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>15</number>
+   </property>
+   <property name="leftMargin">
+    <number>40</number>
+   </property>
+   <property name="topMargin">
+    <number>40</number>
+   </property>
+   <property name="rightMargin">
+    <number>40</number>
+   </property>
+   <property name="bottomMargin">
+    <number>40</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lblBaslik">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>GİRİŞ YAP</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblEmail">
+     <property name="text">
+      <string>E-posta adresi</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="txtEmail">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>35</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>kullanici@gmail.com</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblSifre">
+     <property name="text">
+      <string>Şifre</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="txtSifre">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>35</height>
+      </size>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>********</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="chkOturumAcikKalsin">
+       <property name="text">
+        <string>Oturumum açık kalsın</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSifremiUnuttum">
+       <property name="text">
+        <string>Şifremi unuttum</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string>color: #0078D7;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnGirisYap">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string>background-color: #0078D7; color: white; border-radius: 5px;</string>
+     </property>
+     <property name="text">
+      <string>E-POSTA İLE GİRİŞ YAP</string>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="lblHesapYokMu">
+       <property name="text">
+        <string>Henüz hesabın yok mu?</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnHesapAc">
+       <property name="text">
+        <string>Hesap aç</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <property name="styleSheet">
+        <string>color: #0078D7; text-decoration: underline;</string>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
