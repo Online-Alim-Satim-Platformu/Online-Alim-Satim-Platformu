@@ -23,6 +23,9 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="text">
+     <string>AHMET HAKAN SÖĞÜT isogut30@gmail.com</string>
+    </property>
    </widget>
    <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
