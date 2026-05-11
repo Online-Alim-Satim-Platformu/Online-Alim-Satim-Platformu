@@ -15,6 +15,9 @@ public:
     explicit AnaSayfa(QWidget *parent = nullptr);
     ~AnaSayfa();
 
+private slots:
+    void on_btnIlanVer_clicked(); // İlan verme butonumuzun slotu
+
 private:
     Ui::AnaSayfa *ui;
 };

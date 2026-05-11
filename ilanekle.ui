@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IlanEkle</class>
+ <widget class="QWidget" name="IlanEkle">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Yeni İlan Ekle</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>15</number>
+   </property>
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lblBaslikGenel">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>YENİ İLAN EKLE</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoLayout">
+     <item>
+      <widget class="QLabel" name="lblFotoOnizleme">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>150</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string>background-color: #e0e0e0; border: 2px dashed #aaa;</string>
+       </property>
+       <property name="text">
+        <string>Fotoğraf Yok</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnFotoEkle">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Fotoğraf Seç...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblBaslik">
+     <property name="text">
+      <string>İlan Başlığı:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="txtBaslik"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblFiyat">
+     <property name="text">
+      <string>Fiyat (TL):</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="txtFiyat"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblKategori">
+     <property name="text">
+      <string>Kategori Seçiniz:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="cmbKategori">
+     <item>
+      <property name="text">
+       <string>Emlak</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Vasıta</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Elektronik</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Giyim</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblAciklama">
+     <property name="text">
+      <string>İlan Açıklaması:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="txtAciklama"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnYayinla">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string>background-color: #4CAF50; color: white; font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>İlanı Yayınla</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

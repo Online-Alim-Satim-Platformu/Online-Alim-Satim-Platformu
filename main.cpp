@@ -1,14 +1,15 @@
 #include "girisekrani.h"
-#include "databasemanager.h" // Veritabanı sınıfımızı ekledik
+#include "databasemanager.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Proje başlarken veritabanı bağlantısını kuruyoruz!
+    // Veritabanı bağlantısını başlat
     DatabaseManager::getInstance()->baglantiKur();
 
+    // Giriş ekranını göster
     GirisEkrani w;
     w.show();
 

@@ -17,7 +17,7 @@ public:
 
 private slots:
     void on_btnHesapAc_clicked();
-    void on_btnGirisYap_clicked(); // Giriş yap butonu için ekledik
+    void on_btnGirisYap_clicked();
 
 private:
     Ui::GirisEkrani *ui;
