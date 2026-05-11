@@ -4,13 +4,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QMessageBox>
-#include <QListWidgetItem>
 #include <QDebug>
 
 Profil::Profil(QWidget *parent) : QWidget(parent), ui(new Ui::Profil) {
     ui->setupUi(this);
 
-    // Pencere açıldığı an her iki fonksiyonu da çağırıyoruz
+    // Pencere açıldığı an bilgileri ve ilanları yükle
     kullaniciBilgileriniYukle();
     profilIlanlariniYukle();
 }
@@ -23,45 +22,53 @@ void Profil::kullaniciBilgileriniYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // Tablodan şimdilik ilk kullanıcıyı çekiyoruz
+    // Kullanıcı tablosundan ilk kaydı çekiyoruz
     if (query.exec("SELECT kullaniciAdi, email FROM Kullanici LIMIT 1")) {
         if (query.next()) {
-            // Kullanıcı bulunduysa bilgileri ekrana yaz
             ui->lblAdSoyad->setText(query.value("kullaniciAdi").toString());
             ui->lblEmail->setText(query.value("email").toString());
         } else {
-            // Kullanıcı yoksa boş kalmasın diye uyarı yazısı
-            ui->lblAdSoyad->setText("Kayıtlı Kullanıcı Yok");
-            ui->lblEmail->setText("Lütfen önce kayıt olun.");
+            // Tablo boşsa varsayılan bilgileri göster
+            ui->lblAdSoyad->setText("Berat");
+            ui->lblEmail->setText("berat@example.com");
         }
     } else {
-        qDebug() << "Kullanıcı bilgisi çekilemedi:" << query.lastError().text();
+        qDebug() << "Kullanıcı bilgisi çekilirken hata:" << query.lastError().text();
     }
 }
 
 void Profil::profilIlanlariniYukle() {
-    ui->listProfilIlanlar->clear(); // Önceki listeyi temizle
+    ui->listProfilIlanlar->clear(); // Önce listeyi temizle
 
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
-    QSqlQuery query(db);
+    if (!db.isOpen()) {
+        qDebug() << "Veritabanı kapalı, açılıyor...";
+        db.open();
+    }
 
-    // İlanları çek ve listeye ekle
+    QSqlQuery query(db);
+    // 'Ilan' tablosundaki tüm verileri çekiyoruz
     if (query.exec("SELECT ilanNo, baslik, fiyat FROM Ilan")) {
+        int ilanSayisi = 0;
         while (query.next()) {
-            int ilanNo = query.value("ilanNo").toInt();
+            ilanSayisi++;
+            int id = query.value("ilanNo").toInt();
             QString baslik = query.value("baslik").toString();
             QString fiyat = query.value("fiyat").toString();
 
+            // Listeye yeni bir öğe ekliyoruz
             QListWidgetItem *item = new QListWidgetItem();
             item->setText(baslik + " - " + fiyat + " TL");
 
-            // Silme işlemi için ilan ID'sini öğeye gizliyoruz
-            item->setData(Qt::UserRole, ilanNo);
+            // Silme işlemi için ilanNo bilgisini gizli veri (UserRole) olarak saklıyoruz
+            item->setData(Qt::UserRole, id);
 
             ui->listProfilIlanlar->addItem(item);
         }
+        qDebug() << "Profil ekranına " << ilanSayisi << " adet ilan yüklendi.";
     } else {
-        qDebug() << "İlanlar listelenemedi:" << query.lastError().text();
+        qDebug() << "İlanlar yüklenirken sorgu hatası:" << query.lastError().text();
+        QMessageBox::critical(this, "Hata", "İlanlar veritabanından çekilemedi!");
     }
 }
 
@@ -69,40 +76,56 @@ void Profil::on_btnIlanSil_clicked() {
     QListWidgetItem *seciliItem = ui->listProfilIlanlar->currentItem();
 
     if (!seciliItem) {
-        QMessageBox::warning(this, "Uyarı", "Lütfen silmek istediğiniz ilanı listeden seçin.");
+        QMessageBox::warning(this, "Uyarı", "Lütfen önce silinecek ilanı seçin!");
         return;
     }
 
-    QMessageBox::StandardButton onay;
-    onay = QMessageBox::question(this, "İlanı Sil",
-                                 "Bu ilanı kalıcı olarak silmek istediğinize emin misiniz?",
-                                 QMessageBox::Yes | QMessageBox::No);
+    // 1. ONAY KUTUSU AYARLARI
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Onay");
+    msgBox.setText("Bu ilanı silmek istediğinize emin misiniz?");
+    msgBox.setIcon(QMessageBox::Question);
+    QPushButton *evetButonu = msgBox.addButton("Evet", QMessageBox::YesRole);
+    QPushButton *hayirButonu = msgBox.addButton("Hayır", QMessageBox::NoRole);
 
-    if (onay == QMessageBox::No) {
-        return;
-    }
+    // Siyah yazı ve beyaz arka plan stili
+    QString stil = "QMessageBox { background-color: #ffffff; }"
+                   "QLabel { color: #000000; font-size: 11pt; font-weight: bold; }"
+                   "QPushButton { color: #000000; background-color: #e1e1e1; border: 1px solid #adadad; padding: 5px; min-width: 80px; border-radius: 4px; }";
+    msgBox.setStyleSheet(stil);
+    msgBox.exec();
 
-    // Gizlediğimiz ID'yi alıp veritabanından siliyoruz
-    int silinecekID = seciliItem->data(Qt::UserRole).toInt();
+    if (msgBox.clickedButton() == evetButonu) {
+        int id = seciliItem->data(Qt::UserRole).toInt();
+        QSqlQuery query(DatabaseManager::getInstance()->getDatabase());
+        query.prepare("DELETE FROM Ilan WHERE ilanNo = :id");
+        query.bindValue(":id", id);
 
-    QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
-    QSqlQuery query(db);
+        if (query.exec()) {
+            // 2. BAŞARILI MESAJI (Görüntüdeki ekranın renkli hali)
+            QMessageBox infoBox(this);
+            infoBox.setWindowTitle("Başarılı");
+            infoBox.setText("İlan başarıyla silindi.");
+            infoBox.setIcon(QMessageBox::Information);
 
-    query.prepare("DELETE FROM Ilan WHERE ilanNo = :id");
-    query.bindValue(":id", silinecekID);
+            // Tamam butonunu siyah yapalım
+            QPushButton *okButonu = infoBox.addButton("Tamam", QMessageBox::AcceptRole);
+            infoBox.setStyleSheet(stil); // Aynı siyah-beyaz stili buna da uyguluyoruz
 
-    if (query.exec()) {
-        QMessageBox::information(this, "Başarılı", "İlan başarıyla silindi.");
-        profilIlanlariniYukle(); // Listeyi yenile ki silinen ilan ekrandan gitsin
-    } else {
-        QMessageBox::critical(this, "Hata", "İlan silinemedi: " + query.lastError().text());
+            infoBox.exec();
+
+            profilIlanlariniYukle(); // Listeyi yenile
+        } else {
+            // Hata mesajı gerekirse onu da renklendirebilirsin
+            qDebug() << "Hata:" << query.lastError().text();
+        }
     }
 }
 
 void Profil::on_btnSifreDegistir_clicked() {
-    QMessageBox::information(this, "Bilgi", "Şifre değiştirme özelliği daha sonra eklenecektir.");
+    QMessageBox::information(this, "Bilgi", "Şifre değiştirme fonksiyonu yakında aktif edilecek.");
 }
 
 void Profil::on_btnGeri_clicked() {
-    this->close(); // Ekranı kapatır ve anasayfaya döndürür
+    this->close();
 }
