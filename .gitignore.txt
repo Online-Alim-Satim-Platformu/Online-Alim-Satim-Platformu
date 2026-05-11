@@ -1,0 +1,25 @@
+# Build folders
+build/
+build-*/
+
+# Qt Creator user files
+*.pro.user
+*.pro.user.*
+*.user
+
+# CMake user files
+CMakeLists.txt.user
+
+# Object / temp files
+*.o
+*.obj
+*.tmp
+
+# Auto generated Qt files
+moc_*
+ui_*.h
+qrc_*.cpp
+
+# OS files
+.DS_Store
+Thumbs.db
