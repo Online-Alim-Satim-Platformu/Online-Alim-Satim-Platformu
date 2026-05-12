@@ -4,6 +4,8 @@
 #include <QString>
 #include <QObject>
 #include <QDebug>
+#include <QList>
+#include "IObserver.h"
 
 enum class ListingStatus { Draft, Active, Sold, Removed };
 
@@ -24,20 +26,25 @@ public:
 
     virtual QString getDetay() const = 0;
     virtual QString getTip() const = 0;
+
+    void ekleGozlemci(IObserver* gozlemci) {
+        if (gozlemci && !gozlemciler.contains(gozlemci)) {
+            gozlemciler.append(gozlemci);
+        }
+    }
+
+    void bildir() {
+        for (IObserver* gozlemci : gozlemciler) {
+            gozlemci->guncelle(this);
+        }
+    }
+
+    bool isActive() const {
+        return durum == ListingStatus::Active;
+    }
+
+protected:
+    QList<IObserver*> gozlemciler;
 };
 
-// Alt Sınıflar
-class EmlakIlan : public Ilan {
-public:
-    QString metrekare;
-    QString getTip() const override { return "Emlak"; }
-    QString getDetay() const override { return metrekare + " m2"; }
-};
-
-class VasitaIlan : public Ilan {
-public:
-    int kilometre;
-    QString getTip() const override { return "Vasita"; }
-    QString getDetay() const override { return QString::number(kilometre) + " KM"; }
-};
 #endif

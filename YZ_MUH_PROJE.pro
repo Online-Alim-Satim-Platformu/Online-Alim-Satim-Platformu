@@ -11,14 +11,17 @@ CONFIG += c++17
 SOURCES += \
     ilanfactory.cpp \
     listingcontroller.cpp \
+    ListingDAO.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     Ilan.h \
     IlanTipleri.h \
+    IObserver.h \
     ilanfactory.h \
     listingcontroller.h \
+    ListingDAO.h \
     mainwindow.h
 
 FORMS += \
