@@ -12,6 +12,7 @@ SOURCES += \
     anasayfa.cpp \
     databasemanager.cpp \
     girisekrani.cpp \
+    ilandetay.cpp \
     ilanekle.cpp \
     kayitekrani.cpp \
     main.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     anasayfa.h \
     databasemanager.h \
     girisekrani.h \
+    ilandetay.h \
     ilanekle.h \
     kayitekrani.h \
     mainwindow.h \
@@ -30,6 +32,7 @@ HEADERS += \
 FORMS += \
     anasayfa.ui \
     girisekrani.ui \
+    ilandetay.ui \
     ilanekle.ui \
     kayitekrani.ui \
     mainwindow.ui \

@@ -47,14 +47,13 @@ void GirisEkrani::on_btnGirisYap_clicked()
 
     // Sorgu çalıştıysa ve eşleşen bir kayıt (.next()) bulunduysa:
     if (query.exec() && query.next()) {
-        // Veritabanından kullanıcının adını çekip karşılama mesajı veriyoruz
-        QString ad = query.value("kullaniciAdi").toString();
-        QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");
 
-        // Ana Sayfaya geçiş
+        // Araya giren mesaj kutusu kaldırıldı.
+        // Doğrudan Ana Sayfaya geçiş yapılıyor.
         AnaSayfa *ana = new AnaSayfa();
         ana->show();
         this->close();
+
     } else {
         // Kayıt bulunamadıysa:
         QMessageBox::critical(this, "Hata", "E-posta veya şifre hatalı!");
