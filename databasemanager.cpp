@@ -25,7 +25,6 @@ bool DatabaseManager::baglantiKur() {
     }
 
     QSqlQuery query(db);
-
     query.exec("CREATE TABLE IF NOT EXISTS Kullanici ("
                "kullaniciID INTEGER PRIMARY KEY AUTOINCREMENT, "
                "kullaniciAdi TEXT, sifre TEXT, email TEXT UNIQUE, rol TEXT)");
@@ -35,7 +34,6 @@ bool DatabaseManager::baglantiKur() {
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
                "stokAdedi INTEGER, fotografYolu TEXT)");
 
-    // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
     QSqlQuery checkQuery(db);
     if (checkQuery.exec("SELECT COUNT(*) FROM Kullanici")) {
         if (checkQuery.next() && checkQuery.value(0).toInt() == 0) {
@@ -44,10 +42,9 @@ bool DatabaseManager::baglantiKur() {
                              "VALUES ('Berat', 'berat@2sinifpcmüh.com', '1234', 'admin')");
         }
     }
-
     return true;
 }
 
-QSqlDatabase DatabaseManager::getDatabase() {
+QSqlDatabase& DatabaseManager::getDatabase() {  // ← referans döndür
     return db;
 }

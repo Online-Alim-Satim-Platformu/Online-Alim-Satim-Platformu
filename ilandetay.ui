@@ -1,192 +1,160 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>IlanDetay</class>
- <widget class="QWidget" name="IlanDetay">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>850</width>
-    <height>650</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>İlan Detayları</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: #ffffff;</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout_main">
-   <property name="spacing">
-    <number>20</number>
-   </property>
-   <property name="leftMargin">
-    <number>30</number>
-   </property>
-   <property name="topMargin">
-    <number>20</number>
-   </property>
-   <property name="rightMargin">
-    <number>30</number>
-   </property>
-   <property name="bottomMargin">
-    <number>20</number>
-   </property>
-   <item>
-    <widget class="QLabel" name="lblBaslik">
-     <property name="font">
-      <font>
-       <pointsize>18</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: #2c3e50;</string>
-     </property>
-     <property name="text">
-      <string>İLAN BAŞLIĞI</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_icerik">
-     <property name="spacing">
-      <number>40</number>
-     </property>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_sol">
-       <property name="spacing">
-        <number>20</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="lblFoto">
-         <property name="minimumSize">
-          <size>
-           <width>400</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: #ebedef; border: 2px dashed #bdc3c7; border-radius: 10px;</string>
-         </property>
-         <property name="text">
-          <string>ÜRÜN FOTOĞRAFI</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_Satici">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Satıcı Bilgileri</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="lblSaticiBilgi">
-            <property name="text">
-             <string>Yükleniyor...</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_sol">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_sag">
-       <property name="spacing">
-        <number>15</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="lblDetaylar">
-         <property name="text">
-          <string>Detaylar yükleniyor...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::RichText</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTextBrowser" name="txtAciklama">
-         <property name="styleSheet">
-          <string notr="true">background-color: #f8f9fa; border: 1px solid #dcdcdc;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_alt_butonlar">
+<class>IlanDetay</class>
+
+<widget class="QWidget" name="IlanDetay">
+ <property name="geometry">
+  <rect>
+   <x>0</x>
+   <y>0</y>
+   <width>900</width>
+   <height>650</height>
+  </rect>
+ </property>
+
+ <property name="windowTitle">
+  <string>İlan Detay</string>
+ </property>
+
+ <layout class="QVBoxLayout" name="verticalLayoutMain">
+
+  <!-- Başlık -->
+  <item>
+   <widget class="QLabel" name="lblBaslik">
+    <property name="text">
+     <string>İLAN BAŞLIĞI</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </item>
+
+  <item>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+
+    <!-- SOL -->
+    <item>
+     <layout class="QVBoxLayout">
+
+      <item>
+       <widget class="QLabel" name="lblFoto">
+        <property name="minimumSize">
+         <size>
+          <width>400</width>
+          <height>320</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string>background:#eeeeee;border:2px solid gray;</string>
+        </property>
+        <property name="text">
+         <string>Fotoğraf</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Satıcı Bilgileri</string>
+        </property>
+
+        <layout class="QVBoxLayout">
          <item>
-          <widget class="QPushButton" name="btnAnasayfa">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>45</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton { background-color: #2c3e50; color: white; border-radius: 5px; font-weight: bold; }
-QPushButton:hover { background-color: #34495e; }</string>
-           </property>
+          <widget class="QLabel" name="lblSaticiBilgi">
            <property name="text">
-            <string>← Anasayfaya Dön</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnFavori">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>45</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton { background-color: #b30000; color: white; border-radius: 5px; font-weight: bold; }
-QPushButton:hover { background-color: #d11a2a; }</string>
-           </property>
-           <property name="text">
-            <string>Favorilere Ekle</string>
+            <string>Yükleniyor...</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-  </layout>
- </widget>
+
+       </widget>
+      </item>
+
+     </layout>
+    </item>
+
+    <!-- SAĞ -->
+    <item>
+     <layout class="QVBoxLayout">
+
+      <item>
+       <widget class="QLabel" name="lblDetaylar">
+        <property name="text">
+         <string>Detaylar...</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- BAŞLIK -->
+      <item>
+       <widget class="QLabel" name="lblAciklamaBaslik">
+        <property name="text">
+         <string>İlan Detayı</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+
+      <!-- AÇIKLAMA KUTUSU -->
+      <item>
+       <widget class="QTextEdit" name="txtAciklama">
+        <property name="minimumSize">
+         <size>
+          <width>350</width>
+          <height>250</height>
+         </size>
+        </property>
+
+        <property name="styleSheet">
+         <string>
+background:white;
+border:2px solid #999;
+padding:8px;
+         </string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Butonlar -->
+      <item>
+       <layout class="QHBoxLayout">
+
+        <item>
+         <widget class="QPushButton" name="btnAnasayfa">
+          <property name="text">
+           <string>Anasayfa</string>
+          </property>
+         </widget>
+        </item>
+
+        <item>
+         <widget class="QPushButton" name="btnFavori">
+          <property name="text">
+           <string>Favorilere Ekle</string>
+          </property>
+         </widget>
+        </item>
+
+       </layout>
+      </item>
+
+     </layout>
+    </item>
+
+   </layout>
+  </item>
+
+ </layout>
+</widget>
+
+<resources/>
+<connections/>
 </ui>
