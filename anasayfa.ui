@@ -17,137 +17,75 @@
    <string>background-color: #1a1a1a; color: white;</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>15</number>
-   </property>
-   <property name="leftMargin">
-    <number>20</number>
-   </property>
-   <property name="topMargin">
-    <number>20</number>
-   </property>
-   <property name="rightMargin">
-    <number>20</number>
-   </property>
-   <property name="bottomMargin">
-    <number>20</number>
-   </property>
+   <property name="spacing"><number>15</number></property>
+   <property name="leftMargin"><number>20</number></property>
+   <property name="topMargin"><number>20</number></property>
+   <property name="rightMargin"><number>20</number></property>
+   <property name="bottomMargin"><number>20</number></property>
    <item>
     <layout class="QHBoxLayout" name="topBarLayout">
-     <property name="spacing">
-      <number>20</number>
-     </property>
+     <property name="spacing"><number>20</number></property>
      <item>
       <widget class="QLabel" name="lblLogo">
        <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-         <bold>true</bold>
-        </font>
+        <font><pointsize>14</pointsize><bold>true</bold></font>
        </property>
        <property name="styleSheet">
         <string>color: #0078D7; background-color: white; padding: 10px; border-radius: 15px;</string>
        </property>
-       <property name="text">
-        <string>Online
-Alım Satım</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
+       <property name="text"><string>Online&#xa;Alım Satım</string></property>
+       <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="txtSearch">
-       <property name="minimumSize">
-        <size>
-         <width>300</width>
-         <height>35</height>
-        </size>
-       </property>
+       <property name="minimumSize"><size><width>300</width><height>35</height></size></property>
        <property name="styleSheet">
         <string>background-color: #333333; color: white; border: 1px solid #444444; border-radius: 5px; padding-left: 10px;</string>
        </property>
-       <property name="placeholderText">
-        <string>İlanlarda ara...</string>
-       </property>
+       <property name="placeholderText"><string>İlanlarda ara...</string></property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnProfil">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>35</height>
-        </size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
+       <property name="minimumSize"><size><width>100</width><height>35</height></size></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
        <property name="styleSheet">
         <string>QPushButton { background-color: #444444; color: white; border-radius: 5px; font-weight: bold; }
 QPushButton:hover { background-color: #555555; }</string>
        </property>
-       <property name="text">
-        <string>👤 Profilim</string>
-       </property>
+       <property name="text"><string>👤 Profilim</string></property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnIlanVer">
-       <property name="minimumSize">
-        <size>
-         <width>110</width>
-         <height>35</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
+       <property name="minimumSize"><size><width>110</width><height>35</height></size></property>
+       <property name="font"><font><bold>true</bold></font></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
        <property name="styleSheet">
         <string>QPushButton { background-color: #0078D7; color: white; border-radius: 5px; padding: 5px; }
 QPushButton:hover { background-color: #005a9e; }</string>
        </property>
-       <property name="text">
-        <string>➕ İlan Ver</string>
-       </property>
+       <property name="text"><string>➕ İlan Ver</string></property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string>background-color: #333333;</string>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
+     <property name="styleSheet"><string>background-color: #333333;</string></property>
+     <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="contentLayout">
      <item>
       <widget class="QFrame" name="frameSidebar">
-       <property name="minimumSize">
-        <size>
-         <width>160</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>160</width>
-         <height>16777215</height>
-        </size>
-       </property>
+       <property name="minimumSize"><size><width>160</width><height>0</height></size></property>
+       <property name="maximumSize"><size><width>160</width><height>16777215</height></size></property>
        <property name="styleSheet">
-        <string>QPushButton {
+        <string>QFrame { background-color: transparent; }
+QPushButton {
     background-color: #FF9F00;
     color: #000000;
     border: 1px solid #CC7A00;
@@ -156,53 +94,51 @@ QPushButton:hover { background-color: #005a9e; }</string>
     font-weight: bold;
     text-align: center;
 }
-QPushButton:hover {
-    background-color: #FFB84D;
+QPushButton:hover { background-color: #FFB84D; }
+QPushButton:pressed { background-color: #E68A00; }
+QPushButton#btnTumVitrin {
+    background-color: #0078D7;
+    color: white;
+    border: 1px solid #005a9e;
 }
-QPushButton:pressed {
-    background-color: #E68A00;
-}</string>
+QPushButton#btnTumVitrin:hover { background-color: #005a9e; }</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing"><number>8</number></property>
+        <item>
+         <widget class="QPushButton" name="btnTumVitrin">
+          <property name="minimumHeight"><number>40</number></property>
+          <property name="text"><string>🏠 Ana Sayfa</string></property>
+         </widget>
+        </item>
         <item>
          <widget class="QPushButton" name="btnEmlak">
-          <property name="text">
-           <string>🏠 Emlak</string>
-          </property>
+          <property name="minimumHeight"><number>40</number></property>
+          <property name="text"><string>🏘 Emlak</string></property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnVasita">
-          <property name="text">
-           <string>🚗 Vasıta</string>
-          </property>
+          <property name="minimumHeight"><number>40</number></property>
+          <property name="text"><string>🚗 Vasıta</string></property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnElektronik">
-          <property name="text">
-           <string>💻 Elektronik</string>
-          </property>
+          <property name="minimumHeight"><number>40</number></property>
+          <property name="text"><string>💻 Elektronik</string></property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnGiyim">
-          <property name="text">
-           <string>👕 Giyim</string>
-          </property>
+          <property name="minimumHeight"><number>40</number></property>
+          <property name="text"><string>👕 Giyim</string></property>
          </widget>
         </item>
         <item>
          <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
+          <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
          </spacer>
         </item>
        </layout>
@@ -211,37 +147,11 @@ QPushButton:pressed {
      <item>
       <layout class="QVBoxLayout" name="vitrinLayout">
        <item>
-        <layout class="QHBoxLayout" name="vitrinHeaderLayout">
-         <item>
-          <widget class="QLabel" name="lblVitrinBaslik">
-           <property name="font">
-            <font>
-             <pointsize>13</pointsize>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string>color: white; margin-bottom: 5px;</string>
-           </property>
-           <property name="text">
-            <string>Anasayfa Vitrini</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+        <widget class="QLabel" name="lblVitrinBaslik">
+         <property name="font"><font><pointsize>13</pointsize><bold>true</bold></font></property>
+         <property name="styleSheet"><string>color: white; margin-bottom: 5px;</string></property>
+         <property name="text"><string>Anasayfa Vitrini</string></property>
+        </widget>
        </item>
        <item>
         <widget class="QListWidget" name="listVitrin">
@@ -257,20 +167,21 @@ QListWidget::item {
     color: black;
     font-weight: bold;
     padding: 5px;
+}
+QListWidget::item:hover {
+    background-color: #e8f4fd;
+    border-radius: 5px;
+}
+QListWidget::item:selected {
+    background-color: #0078D7;
+    color: white;
+    border-radius: 5px;
 }</string>
          </property>
-         <property name="resizeMode">
-          <enum>QListView::ResizeMode::Adjust</enum>
-         </property>
-         <property name="spacing">
-          <number>20</number>
-         </property>
-         <property name="viewMode">
-          <enum>QListView::ViewMode::IconMode</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
+         <property name="resizeMode"><enum>QListView::ResizeMode::Adjust</enum></property>
+         <property name="spacing"><number>20</number></property>
+         <property name="viewMode"><enum>QListView::ViewMode::IconMode</enum></property>
+         <property name="wordWrap"><bool>true</bool></property>
         </widget>
        </item>
       </layout>
