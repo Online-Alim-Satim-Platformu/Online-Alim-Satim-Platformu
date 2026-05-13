@@ -13,13 +13,12 @@ public:
     explicit Profil(QWidget *parent = nullptr);
     ~Profil();
 
-    // Veritabanından bilgileri ve ilanları çekecek ana fonksiyonlar
     void profilIlanlariniYukle();
     void kullaniciBilgileriniYukle();
 
 private slots:
-    // Butonların tıklama olayları
     void on_btnIlanSil_clicked();
+    void on_btnIlanDuzenle_clicked();   // YENİ: düzenleme popup'ı
     void on_btnGeri_clicked();
     void on_btnSifreDegistir_clicked();
 
