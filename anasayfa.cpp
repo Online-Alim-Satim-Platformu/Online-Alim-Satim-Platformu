@@ -48,7 +48,8 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
     while (query.next()) {
         int     ilanNo   = query.value("ilanNo").toInt();
         QString baslik   = query.value("baslik").toString();
-        QString fiyat    = query.value("fiyat").toString();
+        double  fiyatVal = query.value("fiyat").toDouble();
+        QString fiyat    = QString("%L1").arg(fiyatVal, 0, 'f', 0); // ör: 1.200.000
         QString fotoYolu = query.value("fotografYolu").toString();
 
         QListWidgetItem *item = new QListWidgetItem();
@@ -152,7 +153,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     }
 
     QString baslik   = query.value("baslik").toString();
-    QString fiyat    = query.value("fiyat").toString();
+    QString fiyat    = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0); // ör: 1.200.000
     QString kategori = query.value("kategori").toString();
     QString aciklama = query.value("aciklama").toString();
     QString fotoYolu = query.value("fotografYolu").toString();
