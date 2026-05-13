@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QListWidgetItem>
+#include <QSqlQuery>
 
 namespace Ui { class AnaSayfa; }
 
