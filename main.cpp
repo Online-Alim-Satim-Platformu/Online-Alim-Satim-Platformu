@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "IlanFactory.h"
 #include "ListingController.h"
+#include "IlanTipleri.h"
 
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
