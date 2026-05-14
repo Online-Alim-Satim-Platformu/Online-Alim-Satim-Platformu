@@ -30,14 +30,11 @@ bool DatabaseManager::baglantiKur() {
                "kullaniciID INTEGER PRIMARY KEY AUTOINCREMENT, "
                "kullaniciAdi TEXT, sifre TEXT, email TEXT UNIQUE, rol TEXT)");
 
-    // DÜZELTME: kullaniciID eklendi ki ilanların kimin olduğu bilinsin
     query.exec("CREATE TABLE IF NOT EXISTS Ilan ("
                "ilanNo INTEGER PRIMARY KEY AUTOINCREMENT, "
-               "kullaniciID INTEGER, "
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
                "stokAdedi INTEGER, fotografYolu TEXT)");
 
-    // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ
     QSqlQuery checkQuery(db);
     if (checkQuery.exec("SELECT COUNT(*) FROM Kullanici")) {
         if (checkQuery.next() && checkQuery.value(0).toInt() == 0) {
@@ -54,7 +51,6 @@ QSqlDatabase DatabaseManager::getDatabase() {
     return db;
 }
 
-// --- YENİ EKLENEN KISIM ---
 void DatabaseManager::setAktifEmail(const QString& email) {
     aktifEmail = email;
 }

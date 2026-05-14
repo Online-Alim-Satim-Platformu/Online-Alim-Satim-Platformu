@@ -29,32 +29,19 @@ void Profil::kullaniciBilgileriniYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-<<<<<<< Updated upstream
-    // DÜZELTME: Aktif kullanıcının ID'sini alıyoruz
-    int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
-
-    query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE kullaniciID = :id");
-    query.bindValue(":id", aktifID);
-=======
-    // --- YENİ EKLENEN KISIM: Aktif kullanıcının mailini al ve ona göre sorgu yap ---
+    // Aktif kullanıcının mailini al ve ona göre sorgu yap
     QString aktifEmail = DatabaseManager::getInstance()->getAktifEmail();
 
     query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE email = :email");
     query.bindValue(":email", aktifEmail);
->>>>>>> Stashed changes
 
     if (query.exec()) {
         if (query.next()) {
             ui->lblAdSoyad->setText(query.value("kullaniciAdi").toString());
             ui->lblEmail->setText(query.value("email").toString());
         } else {
-<<<<<<< Updated upstream
-            ui->lblAdSoyad->setText("Kullanıcı Bulunamadı");
-            ui->lblEmail->setText("-");
-=======
             ui->lblAdSoyad->setText("Bulunamadı");
             ui->lblEmail->setText("Bulunamadı");
->>>>>>> Stashed changes
         }
     } else {
         qDebug() << "Kullanıcı bilgisi hatası:" << query.lastError().text();
@@ -68,14 +55,7 @@ void Profil::profilIlanlariniYukle() {
     if (!db.isOpen()) db.open();
 
     QSqlQuery query(db);
-
-    // DÜZELTME: Sadece aktif giriş yapan kullanıcının kendi ilanlarını çekiyoruz
-    int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
-
-    query.prepare("SELECT ilanNo, baslik, fiyat FROM Ilan WHERE kullaniciID = :id");
-    query.bindValue(":id", aktifID);
-
-    if (query.exec()) {
+    if (query.exec("SELECT ilanNo, baslik, fiyat FROM Ilan")) {
         while (query.next()) {
             QListWidgetItem *item = new QListWidgetItem();
             item->setText(query.value("baslik").toString() + " - " +
@@ -88,9 +68,6 @@ void Profil::profilIlanlariniYukle() {
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// İLAN DÜZENLE
-// ──────────────────────────────────────────────────────────────
 void Profil::on_btnIlanDuzenle_clicked() {
     QListWidgetItem *secili = ui->listProfilIlanlar->currentItem();
     if (!secili) {
@@ -223,9 +200,6 @@ void Profil::on_btnIlanDuzenle_clicked() {
     dialog->exec();
 }
 
-// ──────────────────────────────────────────────────────────────
-// İLAN SİL
-// ──────────────────────────────────────────────────────────────
 void Profil::on_btnIlanSil_clicked() {
     QListWidgetItem *seciliItem = ui->listProfilIlanlar->currentItem();
     if (!seciliItem) {
