@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>650</height>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing"><number>15</number></property>
    <property name="leftMargin"><number>20</number></property>
-   <property name="topMargin"><number>20</number></property>
+   <property name="topMargin"><number>30</number></property>
    <property name="rightMargin"><number>20</number></property>
    <property name="bottomMargin"><number>20</number></property>
    <item>
@@ -37,8 +37,8 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="styleSheet">
-      <string>QGroupBox { background-color: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 15px; }
-QGroupBox::title { subcontrol-origin: margin; top: -10px; color: black; }</string>
+      <string>QGroupBox { background-color: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 25px; padding-top: 10px; }
+QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top center; padding: 0 10px; color: #1f2937; }</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing"><number>15</number></property>
