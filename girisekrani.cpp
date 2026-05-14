@@ -2,7 +2,11 @@
 #include "ui_girisekrani.h"
 #include "kayitekrani.h"
 #include "anasayfa.h"
+<<<<<<< Updated upstream
 #include "databasemanager.h" // DÜZELTME: Veritabanı yöneticisi eklendi
+=======
+#include "databasemanager.h" // Oturumu kaydetmek için bunu ekledik
+>>>>>>> Stashed changes
 #include <QMessageBox>
 #include <QSqlQuery>
 
@@ -59,6 +63,9 @@ void GirisEkrani::on_btnGirisYap_clicked()
         // Veritabanından kullanıcının adını çekip karşılama mesajı veriyoruz
         QString ad = query.value("kullaniciAdi").toString();
         QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");
+
+        // --- YENİ EKLENEN KISIM: Giriş yapan kullanıcının mailini sisteme kaydet ---
+        DatabaseManager::getInstance()->setAktifEmail(email);
 
         // Ana Sayfaya geçiş
         AnaSayfa *ana = new AnaSayfa();

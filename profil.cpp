@@ -29,19 +29,32 @@ void Profil::kullaniciBilgileriniYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
+<<<<<<< Updated upstream
     // DÜZELTME: Aktif kullanıcının ID'sini alıyoruz
     int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
 
     query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE kullaniciID = :id");
     query.bindValue(":id", aktifID);
+=======
+    // --- YENİ EKLENEN KISIM: Aktif kullanıcının mailini al ve ona göre sorgu yap ---
+    QString aktifEmail = DatabaseManager::getInstance()->getAktifEmail();
+
+    query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE email = :email");
+    query.bindValue(":email", aktifEmail);
+>>>>>>> Stashed changes
 
     if (query.exec()) {
         if (query.next()) {
             ui->lblAdSoyad->setText(query.value("kullaniciAdi").toString());
             ui->lblEmail->setText(query.value("email").toString());
         } else {
+<<<<<<< Updated upstream
             ui->lblAdSoyad->setText("Kullanıcı Bulunamadı");
             ui->lblEmail->setText("-");
+=======
+            ui->lblAdSoyad->setText("Bulunamadı");
+            ui->lblEmail->setText("Bulunamadı");
+>>>>>>> Stashed changes
         }
     } else {
         qDebug() << "Kullanıcı bilgisi hatası:" << query.lastError().text();

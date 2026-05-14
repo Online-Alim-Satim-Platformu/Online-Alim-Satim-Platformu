@@ -53,3 +53,12 @@ bool DatabaseManager::baglantiKur() {
 QSqlDatabase DatabaseManager::getDatabase() {
     return db;
 }
+
+// --- YENİ EKLENEN KISIM ---
+void DatabaseManager::setAktifEmail(const QString& email) {
+    aktifEmail = email;
+}
+
+QString DatabaseManager::getAktifEmail() const {
+    return aktifEmail;
+}
