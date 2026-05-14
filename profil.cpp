@@ -26,14 +26,30 @@ Profil::~Profil() {
 }
 
 void Profil::kullaniciBilgileriniYukle() {
+    // Aktif kullanıcının ID'sini Singleton üzerinden alıyoruz
+    int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
+
+    // Güvenlik: Eğer kimse giriş yapmamışsa
+    if (aktifID == -1) {
+        ui->lblAdSoyad->setText("Misafir");
+        ui->lblEmail->setText("Giriş yapılmadı");
+        return;
+    }
+
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
+<<<<<<< Updated upstream
     // Aktif kullanıcının mailini al ve ona göre sorgu yap
     QString aktifEmail = DatabaseManager::getInstance()->getAktifEmail();
 
     query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE email = :email");
     query.bindValue(":email", aktifEmail);
+=======
+    // Sadece giriş yapan aktif kullanıcının verilerini çekiyoruz
+    query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE kullaniciID = :id");
+    query.bindValue(":id", aktifID);
+>>>>>>> Stashed changes
 
     if (query.exec()) {
         if (query.next()) {
@@ -41,7 +57,11 @@ void Profil::kullaniciBilgileriniYukle() {
             ui->lblEmail->setText(query.value("email").toString());
         } else {
             ui->lblAdSoyad->setText("Bulunamadı");
+<<<<<<< Updated upstream
             ui->lblEmail->setText("Bulunamadı");
+=======
+            ui->lblEmail->setText("-");
+>>>>>>> Stashed changes
         }
     } else {
         qDebug() << "Kullanıcı bilgisi hatası:" << query.lastError().text();

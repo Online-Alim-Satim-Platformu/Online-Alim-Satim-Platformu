@@ -51,10 +51,20 @@ QSqlDatabase DatabaseManager::getDatabase() {
     return db;
 }
 
+<<<<<<< Updated upstream
 void DatabaseManager::setAktifEmail(const QString& email) {
     aktifEmail = email;
 }
 
 QString DatabaseManager::getAktifEmail() const {
     return aktifEmail;
+=======
+// Oturum yönetimi için eklenen fonksiyonların gövdeleri
+void DatabaseManager::setAktifKullaniciID(int id) {
+    aktifKullaniciID = id;
+}
+
+int DatabaseManager::getAktifKullaniciID() {
+    return aktifKullaniciID;
+>>>>>>> Stashed changes
 }
