@@ -13,30 +13,26 @@ class AnaSayfa : public QWidget {
 public:
     explicit AnaSayfa(QWidget *parent = nullptr);
     ~AnaSayfa();
-    void ilanlariYukle();                                // Tüm ilanlar (Ana Sayfa)
-    void kategoriIlanlariYukle(const QString &kategori); // Kategori filtresi
+    void ilanlariYukle();
+    void kategoriIlanlariYukle(const QString &kategori);
 
 private slots:
-    // Sol sidebar butonları
-    void on_btnTumVitrin_clicked();     // Ana Sayfa → tüm ilanlar
+    void on_btnTumVitrin_clicked();
     void on_btnEmlak_clicked();
     void on_btnVasita_clicked();
     void on_btnElektronik_clicked();
     void on_btnGiyim_clicked();
 
-    // Üst bar
     void on_btnIlanVer_clicked();
     void on_btnProfil_clicked();
+    void on_btnCikisYap_clicked();   // Yeni eklenen slot
 
-    // Arama kutusu → canlı filtreleme
     void on_txtSearch_textChanged(const QString &arananKelime);
-
-    // İlana çift tıklayınca detay popup
     void on_listVitrin_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::AnaSayfa *ui;
-    void listeyiDoldur(QSqlQuery &query); // Ortak liste doldurma
+    void listeyiDoldur(QSqlQuery &query);
 };
 
 #endif // ANASAYFA_H

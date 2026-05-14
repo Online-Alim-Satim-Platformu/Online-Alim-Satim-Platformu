@@ -3,6 +3,7 @@
 #include "ilanekle.h"
 #include "databasemanager.h"
 #include "profil.h"
+#include "girisekrani.h"          // Çıkış yapınca giriş ekranını açmak için
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
@@ -35,7 +36,6 @@ AnaSayfa::~AnaSayfa() {
 
 // ──────────────────────────────────────────────────────────────
 // ORTAK LİSTE DOLDURMA FONKSİYONU
-// Her ilan için ilanNo'yu UserRole'a kaydediyoruz (detay için lazım)
 // ──────────────────────────────────────────────────────────────
 void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
     ui->listVitrin->clear();
@@ -70,7 +70,7 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// TÜM İLANLARI YÜKLE (Ana Sayfa)
+// TÜM İLANLARI YÜKLE
 // ──────────────────────────────────────────────────────────────
 void AnaSayfa::ilanlariYukle() {
     ui->lblVitrinBaslik->setText("Anasayfa Vitrini");
@@ -135,7 +135,7 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// İLAN DETAY POPUP (Çift tıklayınca açılır)
+// İLAN DETAY POPUP (Stok bilgisi ile)
 // ──────────────────────────────────────────────────────────────
 void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     int ilanNo = item->data(Qt::UserRole).toInt();
@@ -143,7 +143,6 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // stokAdedi de sorguya eklendi
     query.prepare("SELECT baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu "
                   "FROM Ilan WHERE ilanNo = :id");
     query.bindValue(":id", ilanNo);
@@ -182,33 +181,30 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         }
     }
 
-    // Başlık
     QLabel *lblBaslik = new QLabel(baslik);
     lblBaslik->setStyleSheet("font-size: 18px; font-weight: bold; color: white;");
     lblBaslik->setWordWrap(true);
     anaLayout->addWidget(lblBaslik);
 
-    // Fiyat
     QLabel *lblFiyat = new QLabel("💰 " + fiyat + " TL");
     lblFiyat->setStyleSheet("font-size: 16px; font-weight: bold; color: #4CAF50;");
     anaLayout->addWidget(lblFiyat);
 
-    // Kategori
     QLabel *lblKategori = new QLabel("📂 Kategori: " + kategori);
     lblKategori->setStyleSheet("font-size: 13px; color: #aaaaaa;");
     anaLayout->addWidget(lblKategori);
 
-    // ── STOK BİLGİSİ ──
+    // Stok Bilgisi
     QString stokRenk;
     QString stokMetin;
     if (stokAdedi <= 0) {
-        stokRenk = "#f44336"; // kırmızı
+        stokRenk = "#f44336";
         stokMetin = "❌ Stokta Yok";
     } else if (stokAdedi <= 5) {
-        stokRenk = "#FF9F00"; // turuncu (az stok uyarısı)
+        stokRenk = "#FF9F00";
         stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet (Son ürünler!)";
     } else {
-        stokRenk = "#4CAF50"; // yeşil
+        stokRenk = "#4CAF50";
         stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet";
     }
 
@@ -216,18 +212,15 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     lblStok->setStyleSheet(QString("font-size: 14px; font-weight: bold; color: %1;").arg(stokRenk));
     anaLayout->addWidget(lblStok);
 
-    // Ayırıcı çizgi
     QFrame *cizgi = new QFrame();
     cizgi->setFrameShape(QFrame::HLine);
     cizgi->setStyleSheet("color: #444444;");
     anaLayout->addWidget(cizgi);
 
-    // Açıklama başlığı
     QLabel *lblAciklamaBaslik = new QLabel("📝 Açıklama:");
     lblAciklamaBaslik->setStyleSheet("font-size: 13px; font-weight: bold; color: #cccccc;");
     anaLayout->addWidget(lblAciklamaBaslik);
 
-    // Açıklama metni (kaydırılabilir)
     QLabel *lblAciklama = new QLabel(aciklama.isEmpty() ? "Açıklama girilmemiş." : aciklama);
     lblAciklama->setStyleSheet("font-size: 13px; color: white; padding: 8px; "
                                "background-color: #2d2d2d; border-radius: 6px;");
@@ -241,7 +234,6 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     scroll->setStyleSheet("border: none; background-color: #2d2d2d;");
     anaLayout->addWidget(scroll);
 
-    // Kapat butonu
     QPushButton *btnKapat = new QPushButton("✖ Kapat");
     btnKapat->setStyleSheet("QPushButton { background-color: #555555; color: white; "
                             "border-radius: 6px; padding: 8px; font-weight: bold; }"
@@ -275,4 +267,11 @@ void AnaSayfa::on_btnProfil_clicked() {
     Profil *p = new Profil();
     p->setAttribute(Qt::WA_DeleteOnClose);
     p->show();
+}
+
+// ─── YENİ EKLENEN ÇIKIŞ YAP SLOTU ───
+void AnaSayfa::on_btnCikisYap_clicked() {
+    GirisEkrani *giris = new GirisEkrani();
+    giris->show();
+    this->close();
 }
