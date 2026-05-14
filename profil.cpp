@@ -26,10 +26,8 @@ Profil::~Profil() {
 }
 
 void Profil::kullaniciBilgileriniYukle() {
-    // Aktif kullanıcının ID'sini Singleton üzerinden alıyoruz
     int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
 
-    // Güvenlik: Eğer kimse giriş yapmamışsa
     if (aktifID == -1) {
         ui->lblAdSoyad->setText("Misafir");
         ui->lblEmail->setText("Giriş yapılmadı");
@@ -39,17 +37,8 @@ void Profil::kullaniciBilgileriniYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-<<<<<<< Updated upstream
-    // Aktif kullanıcının mailini al ve ona göre sorgu yap
-    QString aktifEmail = DatabaseManager::getInstance()->getAktifEmail();
-
-    query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE email = :email");
-    query.bindValue(":email", aktifEmail);
-=======
-    // Sadece giriş yapan aktif kullanıcının verilerini çekiyoruz
     query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE kullaniciID = :id");
     query.bindValue(":id", aktifID);
->>>>>>> Stashed changes
 
     if (query.exec()) {
         if (query.next()) {
@@ -57,11 +46,7 @@ void Profil::kullaniciBilgileriniYukle() {
             ui->lblEmail->setText(query.value("email").toString());
         } else {
             ui->lblAdSoyad->setText("Bulunamadı");
-<<<<<<< Updated upstream
-            ui->lblEmail->setText("Bulunamadı");
-=======
             ui->lblEmail->setText("-");
->>>>>>> Stashed changes
         }
     } else {
         qDebug() << "Kullanıcı bilgisi hatası:" << query.lastError().text();
@@ -88,6 +73,9 @@ void Profil::profilIlanlariniYukle() {
     }
 }
 
+// ──────────────────────────────────────────────────────────────
+// EKSİKSİZ EKLENEN KISIM: İLAN DÜZENLEME İŞLEMİ
+// ──────────────────────────────────────────────────────────────
 void Profil::on_btnIlanDuzenle_clicked() {
     QListWidgetItem *secili = ui->listProfilIlanlar->currentItem();
     if (!secili) {
@@ -118,15 +106,7 @@ void Profil::on_btnIlanDuzenle_clicked() {
     dialog->setStyleSheet("background-color: #f9fafb; color: #000000;");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-    QString inputStyle = "QLineEdit, QTextEdit, QComboBox {"
-                         "  background-color: white;"
-                         "  color: #000000;"
-                         "  border: 1px solid #d1d5db;"
-                         "  border-radius: 6px;"
-                         "  padding: 6px;"
-                         "  font-size: 10pt;"
-                         "}"
-                         "QLabel { color: #000000; font-weight: bold; }";
+    QString inputStyle = "QLineEdit, QTextEdit, QComboBox { background-color: white; color: #000000; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; font-size: 10pt; } QLabel { color: #000000; font-weight: bold; }";
     dialog->setStyleSheet(dialog->styleSheet() + inputStyle);
 
     QVBoxLayout *anaLayout = new QVBoxLayout(dialog);
@@ -140,7 +120,6 @@ void Profil::on_btnIlanDuzenle_clicked() {
 
     QLabel *lblFiyat = new QLabel("Fiyat (TL):");
     QLineEdit *txtFiyat = new QLineEdit(mevcutFiyat);
-    txtFiyat->setPlaceholderText("Örn: 1500");
     anaLayout->addWidget(lblFiyat);
     anaLayout->addWidget(txtFiyat);
 
@@ -149,9 +128,7 @@ void Profil::on_btnIlanDuzenle_clicked() {
     cmbKategori->addItems({"Emlak", "Vasıta", "Elektronik", "Giyim"});
     int idx = cmbKategori->findText(mevcutKategori);
     if (idx >= 0) cmbKategori->setCurrentIndex(idx);
-    cmbKategori->setStyleSheet("QComboBox { background-color: white; color: #000000; "
-                               "border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; }"
-                               "QComboBox QAbstractItemView { background-color: white; color: #000000; }");
+    cmbKategori->setStyleSheet("QComboBox { background-color: white; color: #000000; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; } QComboBox QAbstractItemView { background-color: white; color: #000000; }");
     anaLayout->addWidget(lblKategori);
     anaLayout->addWidget(cmbKategori);
 
@@ -164,16 +141,10 @@ void Profil::on_btnIlanDuzenle_clicked() {
     QHBoxLayout *butonLayout = new QHBoxLayout();
     QPushButton *btnKaydet = new QPushButton("💾 Kaydet");
     QPushButton *btnIptal  = new QPushButton("✖ İptal");
-
     btnKaydet->setMinimumHeight(38);
     btnIptal->setMinimumHeight(38);
-
-    btnKaydet->setStyleSheet("QPushButton { background-color: #0078D7; color: white; "
-                             "font-weight: bold; border-radius: 7px; }"
-                             "QPushButton:hover { background-color: #005a9e; }");
-    btnIptal->setStyleSheet("QPushButton { background-color: #9ca3af; color: white; "
-                            "font-weight: bold; border-radius: 7px; }"
-                            "QPushButton:hover { background-color: #6b7280; }");
+    btnKaydet->setStyleSheet("QPushButton { background-color: #0078D7; color: white; font-weight: bold; border-radius: 7px; } QPushButton:hover { background-color: #005a9e; }");
+    btnIptal->setStyleSheet("QPushButton { background-color: #9ca3af; color: white; font-weight: bold; border-radius: 7px; } QPushButton:hover { background-color: #6b7280; }");
 
     butonLayout->addWidget(btnKaydet);
     butonLayout->addWidget(btnIptal);
@@ -199,8 +170,7 @@ void Profil::on_btnIlanDuzenle_clicked() {
         }
 
         QSqlQuery guncelle(DatabaseManager::getInstance()->getDatabase());
-        guncelle.prepare("UPDATE Ilan SET baslik = :b, fiyat = :f, kategori = :k, aciklama = :a "
-                         "WHERE ilanNo = :id");
+        guncelle.prepare("UPDATE Ilan SET baslik = :b, fiyat = :f, kategori = :k, aciklama = :a WHERE ilanNo = :id");
         guncelle.bindValue(":b",  yeniBaslik);
         guncelle.bindValue(":f",  yeniFiyat);
         guncelle.bindValue(":k",  yeniKategori);
@@ -216,10 +186,12 @@ void Profil::on_btnIlanDuzenle_clicked() {
     });
 
     connect(dialog, &QDialog::accepted, this, &Profil::profilIlanlariniYukle);
-
     dialog->exec();
 }
 
+// ──────────────────────────────────────────────────────────────
+// MEVCUT İLAN SİLME İŞLEMİ (DOKUNULMADI)
+// ──────────────────────────────────────────────────────────────
 void Profil::on_btnIlanSil_clicked() {
     QListWidgetItem *seciliItem = ui->listProfilIlanlar->currentItem();
     if (!seciliItem) {
@@ -227,10 +199,7 @@ void Profil::on_btnIlanSil_clicked() {
         return;
     }
 
-    QString stil = "QMessageBox { background-color: #ffffff; }"
-                   "QLabel { color: #000000; font-size: 11pt; font-weight: bold; }"
-                   "QPushButton { color: #000000; background-color: #e1e1e1; border: 1px solid #adadad; "
-                   "padding: 5px; min-width: 80px; border-radius: 4px; }";
+    QString stil = "QMessageBox { background-color: #ffffff; } QLabel { color: #000000; font-size: 11pt; font-weight: bold; } QPushButton { color: #000000; background-color: #e1e1e1; border: 1px solid #adadad; padding: 5px; min-width: 80px; border-radius: 4px; }";
 
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("Onay");

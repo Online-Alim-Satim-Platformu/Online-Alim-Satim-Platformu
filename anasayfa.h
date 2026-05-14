@@ -27,6 +27,7 @@ private slots:
     void on_btnGiyim_clicked();
     void on_btnIlanVer_clicked();
     void on_btnProfil_clicked();
+    void on_btnCikisYap_clicked(); // Çıkış yapma slotu
     void on_txtSearch_textChanged(const QString &arananKelime);
     void on_listVitrin_itemDoubleClicked(QListWidgetItem *item);
 

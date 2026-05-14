@@ -2,11 +2,7 @@
 #include "ui_girisekrani.h"
 #include "kayitekrani.h"
 #include "anasayfa.h"
-<<<<<<< Updated upstream
-#include "databasemanager.h"
-=======
 #include "databasemanager.h" // YENİ EKLENDİ: Oturum yönetimi için gerekli
->>>>>>> Stashed changes
 #include <QMessageBox>
 #include <QSqlQuery>
 
@@ -16,6 +12,7 @@ GirisEkrani::GirisEkrani(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // Büyü burada gerçekleşiyor: Şifre veya E-posta kutusundayken "Enter" tuşuna basılırsa Giriş Yap butonunu tetikle!
     connect(ui->txtSifre, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
     connect(ui->txtEmail, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
 }
@@ -37,19 +34,20 @@ void GirisEkrani::on_btnGirisYap_clicked()
     QString email = ui->txtEmail->text();
     QString sifre = ui->txtSifre->text();
 
+    // 1. Kutucuklar boş mu kontrolü
     if (email.isEmpty() || sifre.isEmpty()) {
         QMessageBox::warning(this, "Uyarı", "Lütfen e-posta ve şifrenizi giriniz!");
         return;
     }
 
+    // 2. Veritabanında kullanıcıyı arama
     QSqlQuery query;
     query.prepare("SELECT * FROM Kullanici WHERE email = :email AND sifre = :sifre");
     query.bindValue(":email", email);
     query.bindValue(":sifre", sifre);
 
+    // Sorgu çalıştıysa ve eşleşen bir kayıt (.next()) bulunduysa:
     if (query.exec() && query.next()) {
-<<<<<<< Updated upstream
-=======
 
         // --- YENİ EKLENEN KISIM BAŞLANGICI ---
         // Veritabanındaki ID'yi alıyoruz ve tüm sisteme duyurmak için Singleton'a kaydediyoruz
@@ -58,17 +56,15 @@ void GirisEkrani::on_btnGirisYap_clicked()
         // --- YENİ EKLENEN KISIM BİTİŞİ ---
 
         // Veritabanından kullanıcının adını çekip karşılama mesajı veriyoruz
->>>>>>> Stashed changes
         QString ad = query.value("kullaniciAdi").toString();
         QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");
 
-        // Giriş yapan kullanıcının mailini sisteme kaydet
-        DatabaseManager::getInstance()->setAktifEmail(email);
-
+        // Ana Sayfaya geçiş
         AnaSayfa *ana = new AnaSayfa();
         ana->show();
         this->close();
     } else {
+        // Kayıt bulunamadıysa:
         QMessageBox::critical(this, "Hata", "E-posta veya şifre hatalı!");
     }
 }

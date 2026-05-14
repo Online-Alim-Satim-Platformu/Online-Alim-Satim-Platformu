@@ -17,8 +17,8 @@ public:
     void kullaniciBilgileriniYukle();
 
 private slots:
+    void on_btnIlanDuzenle_clicked(); // İlan düzenleme butonu eklendi
     void on_btnIlanSil_clicked();
-    void on_btnIlanDuzenle_clicked();
     void on_btnGeri_clicked();
     void on_btnSifreDegistir_clicked();
 

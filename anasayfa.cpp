@@ -3,6 +3,7 @@
 #include "ilanekle.h"
 #include "databasemanager.h"
 #include "profil.h"
+#include "girisekrani.h" // Giriş ekranına dönmek için gerekli
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
@@ -148,7 +149,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     anaLayout->setContentsMargins(20, 20, 20, 20);
 
     if (!fotoYolu.isEmpty()) {
-        QLabel *lblFoto = new QLabel();
+        QLabel *lblFoto = new QLabel(detay); // Memory leak önlemi için detay eklendi
         QPixmap px(fotoYolu);
         if (!px.isNull()) {
             lblFoto->setPixmap(px.scaled(460, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -200,6 +201,28 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     anaLayout->addWidget(btnKapat);
 
     detay->exec();
+}
+
+// ──────────────────────────────────────────────────────────────
+// ÇIKIŞ YAP FONKSİYONU
+// ──────────────────────────────────────────────────────────────
+void AnaSayfa::on_btnCikisYap_clicked() {
+    // 1. Kullanıcıdan onay al
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Çıkış Yap", "Hesabınızdan çıkış yapmak istediğinize emin misiniz?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        // 2. Aktif oturumu sıfırla (kimse girmediği için -1 yap)
+        DatabaseManager::getInstance()->setAktifKullaniciID(-1);
+
+        // 3. Giriş ekranını oluştur ve göster
+        GirisEkrani *login = new GirisEkrani();
+        login->show();
+
+        // 4. Mevcut Anasayfayı kapat
+        this->close();
+    }
 }
 
 void AnaSayfa::on_btnTumVitrin_clicked()  { ilanlariYukle(); }

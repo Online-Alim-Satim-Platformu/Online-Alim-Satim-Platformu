@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
+    <width>900</width>
     <height>650</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
    <property name="bottomMargin"><number>20</number></property>
    <item>
     <layout class="QHBoxLayout" name="topBarLayout">
-     <property name="spacing"><number>20</number></property>
+     <property name="spacing"><number>15</number></property>
      <item>
       <widget class="QLabel" name="lblLogo">
        <property name="font">
@@ -39,7 +39,7 @@
      </item>
      <item>
       <widget class="QLineEdit" name="txtSearch">
-       <property name="minimumSize"><size><width>300</width><height>35</height></size></property>
+       <property name="minimumSize"><size><width>250</width><height>35</height></size></property>
        <property name="styleSheet">
         <string>background-color: #333333; color: white; border: 1px solid #444444; border-radius: 5px; padding-left: 10px;</string>
        </property>
@@ -48,7 +48,7 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnProfil">
-       <property name="minimumSize"><size><width>100</width><height>35</height></size></property>
+       <property name="minimumSize"><size><width>90</width><height>35</height></size></property>
        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
        <property name="styleSheet">
         <string>QPushButton { background-color: #444444; color: white; border-radius: 5px; font-weight: bold; }
@@ -59,7 +59,7 @@ QPushButton:hover { background-color: #555555; }</string>
      </item>
      <item>
       <widget class="QPushButton" name="btnIlanVer">
-       <property name="minimumSize"><size><width>110</width><height>35</height></size></property>
+       <property name="minimumSize"><size><width>100</width><height>35</height></size></property>
        <property name="font"><font><bold>true</bold></font></property>
        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
        <property name="styleSheet">
@@ -67,6 +67,17 @@ QPushButton:hover { background-color: #555555; }</string>
 QPushButton:hover { background-color: #005a9e; }</string>
        </property>
        <property name="text"><string>➕ İlan Ver</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCikisYap">
+       <property name="minimumSize"><size><width>100</width><height>35</height></size></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       <property name="styleSheet">
+        <string>QPushButton { background-color: #ef4444; color: white; border-radius: 5px; font-weight: bold; }
+QPushButton:hover { background-color: #dc2626; }</string>
+       </property>
+       <property name="text"><string>🚪 Çıkış Yap</string></property>
       </widget>
      </item>
     </layout>

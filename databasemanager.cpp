@@ -35,6 +35,7 @@ bool DatabaseManager::baglantiKur() {
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
                "stokAdedi INTEGER, fotografYolu TEXT)");
 
+    // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
     QSqlQuery checkQuery(db);
     if (checkQuery.exec("SELECT COUNT(*) FROM Kullanici")) {
         if (checkQuery.next() && checkQuery.value(0).toInt() == 0) {
@@ -51,14 +52,6 @@ QSqlDatabase DatabaseManager::getDatabase() {
     return db;
 }
 
-<<<<<<< Updated upstream
-void DatabaseManager::setAktifEmail(const QString& email) {
-    aktifEmail = email;
-}
-
-QString DatabaseManager::getAktifEmail() const {
-    return aktifEmail;
-=======
 // Oturum yönetimi için eklenen fonksiyonların gövdeleri
 void DatabaseManager::setAktifKullaniciID(int id) {
     aktifKullaniciID = id;
@@ -66,5 +59,4 @@ void DatabaseManager::setAktifKullaniciID(int id) {
 
 int DatabaseManager::getAktifKullaniciID() {
     return aktifKullaniciID;
->>>>>>> Stashed changes
 }
