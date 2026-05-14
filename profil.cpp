@@ -5,11 +5,18 @@
 #include <QSqlError>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QComboBox>
+#include <QPushButton>
 
 Profil::Profil(QWidget *parent) : QWidget(parent), ui(new Ui::Profil) {
     ui->setupUi(this);
-
-    // Pencere açıldığı an bilgileri ve ilanları yükle
     kullaniciBilgileriniYukle();
     profilIlanlariniYukle();
 }
@@ -22,76 +29,208 @@ void Profil::kullaniciBilgileriniYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // Kullanıcı tablosundan ilk kaydı çekiyoruz
-    if (query.exec("SELECT kullaniciAdi, email FROM Kullanici LIMIT 1")) {
+    // DÜZELTME: Aktif kullanıcının ID'sini alıyoruz
+    int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
+
+    query.prepare("SELECT kullaniciAdi, email FROM Kullanici WHERE kullaniciID = :id");
+    query.bindValue(":id", aktifID);
+
+    if (query.exec()) {
         if (query.next()) {
             ui->lblAdSoyad->setText(query.value("kullaniciAdi").toString());
             ui->lblEmail->setText(query.value("email").toString());
         } else {
-            // Tablo boşsa varsayılan bilgileri göster
-            ui->lblAdSoyad->setText("Berat");
-            ui->lblEmail->setText("berat@example.com");
+            ui->lblAdSoyad->setText("Kullanıcı Bulunamadı");
+            ui->lblEmail->setText("-");
         }
     } else {
-        qDebug() << "Kullanıcı bilgisi çekilirken hata:" << query.lastError().text();
+        qDebug() << "Kullanıcı bilgisi hatası:" << query.lastError().text();
     }
 }
 
 void Profil::profilIlanlariniYukle() {
-    ui->listProfilIlanlar->clear(); // Önce listeyi temizle
+    ui->listProfilIlanlar->clear();
 
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
-    if (!db.isOpen()) {
-        qDebug() << "Veritabanı kapalı, açılıyor...";
-        db.open();
-    }
+    if (!db.isOpen()) db.open();
 
     QSqlQuery query(db);
-    // 'Ilan' tablosundaki tüm verileri çekiyoruz
-    if (query.exec("SELECT ilanNo, baslik, fiyat FROM Ilan")) {
-        int ilanSayisi = 0;
+
+    // DÜZELTME: Sadece aktif giriş yapan kullanıcının kendi ilanlarını çekiyoruz
+    int aktifID = DatabaseManager::getInstance()->getAktifKullaniciID();
+
+    query.prepare("SELECT ilanNo, baslik, fiyat FROM Ilan WHERE kullaniciID = :id");
+    query.bindValue(":id", aktifID);
+
+    if (query.exec()) {
         while (query.next()) {
-            ilanSayisi++;
-            int id = query.value("ilanNo").toInt();
-            QString baslik = query.value("baslik").toString();
-            QString fiyat = query.value("fiyat").toString();
-
-            // Listeye yeni bir öğe ekliyoruz
             QListWidgetItem *item = new QListWidgetItem();
-            item->setText(baslik + " - " + fiyat + " TL");
-
-            // Silme işlemi için ilanNo bilgisini gizli veri (UserRole) olarak saklıyoruz
-            item->setData(Qt::UserRole, id);
-
+            item->setText(query.value("baslik").toString() + " - " +
+                          query.value("fiyat").toString() + " TL");
+            item->setData(Qt::UserRole, query.value("ilanNo").toInt());
             ui->listProfilIlanlar->addItem(item);
         }
-        qDebug() << "Profil ekranına " << ilanSayisi << " adet ilan yüklendi.";
     } else {
-        qDebug() << "İlanlar yüklenirken sorgu hatası:" << query.lastError().text();
-        QMessageBox::critical(this, "Hata", "İlanlar veritabanından çekilemedi!");
+        qDebug() << "İlan yükleme hatası:" << query.lastError().text();
     }
 }
 
+// ──────────────────────────────────────────────────────────────
+// İLAN DÜZENLE
+// ──────────────────────────────────────────────────────────────
+void Profil::on_btnIlanDuzenle_clicked() {
+    QListWidgetItem *secili = ui->listProfilIlanlar->currentItem();
+    if (!secili) {
+        QMessageBox::warning(this, "Uyarı", "Lütfen önce düzenlemek istediğiniz ilanı seçin!");
+        return;
+    }
+
+    int ilanNo = secili->data(Qt::UserRole).toInt();
+
+    QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
+    QSqlQuery query(db);
+    query.prepare("SELECT baslik, fiyat, kategori, aciklama FROM Ilan WHERE ilanNo = :id");
+    query.bindValue(":id", ilanNo);
+
+    if (!query.exec() || !query.next()) {
+        QMessageBox::critical(this, "Hata", "İlan bilgileri yüklenemedi.");
+        return;
+    }
+
+    QString mevcutBaslik   = query.value("baslik").toString();
+    QString mevcutFiyat    = query.value("fiyat").toString();
+    QString mevcutKategori = query.value("kategori").toString();
+    QString mevcutAciklama = query.value("aciklama").toString();
+
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("İlanı Düzenle");
+    dialog->setMinimumWidth(420);
+    dialog->setStyleSheet("background-color: #f9fafb; color: #000000;");
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    QString inputStyle = "QLineEdit, QTextEdit, QComboBox {"
+                         "  background-color: white;"
+                         "  color: #000000;"
+                         "  border: 1px solid #d1d5db;"
+                         "  border-radius: 6px;"
+                         "  padding: 6px;"
+                         "  font-size: 10pt;"
+                         "}"
+                         "QLabel { color: #000000; font-weight: bold; }";
+    dialog->setStyleSheet(dialog->styleSheet() + inputStyle);
+
+    QVBoxLayout *anaLayout = new QVBoxLayout(dialog);
+    anaLayout->setSpacing(12);
+    anaLayout->setContentsMargins(20, 20, 20, 20);
+
+    QLabel *lblBaslik = new QLabel("Başlık:");
+    QLineEdit *txtBaslik = new QLineEdit(mevcutBaslik);
+    anaLayout->addWidget(lblBaslik);
+    anaLayout->addWidget(txtBaslik);
+
+    QLabel *lblFiyat = new QLabel("Fiyat (TL):");
+    QLineEdit *txtFiyat = new QLineEdit(mevcutFiyat);
+    txtFiyat->setPlaceholderText("Örn: 1500");
+    anaLayout->addWidget(lblFiyat);
+    anaLayout->addWidget(txtFiyat);
+
+    QLabel *lblKategori = new QLabel("Kategori:");
+    QComboBox *cmbKategori = new QComboBox();
+    cmbKategori->addItems({"Emlak", "Vasıta", "Elektronik", "Giyim"});
+    int idx = cmbKategori->findText(mevcutKategori);
+    if (idx >= 0) cmbKategori->setCurrentIndex(idx);
+    cmbKategori->setStyleSheet("QComboBox { background-color: white; color: #000000; "
+                               "border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; }"
+                               "QComboBox QAbstractItemView { background-color: white; color: #000000; }");
+    anaLayout->addWidget(lblKategori);
+    anaLayout->addWidget(cmbKategori);
+
+    QLabel *lblAciklama = new QLabel("Açıklama:");
+    QTextEdit *txtAciklama = new QTextEdit(mevcutAciklama);
+    txtAciklama->setMinimumHeight(90);
+    anaLayout->addWidget(lblAciklama);
+    anaLayout->addWidget(txtAciklama);
+
+    QHBoxLayout *butonLayout = new QHBoxLayout();
+    QPushButton *btnKaydet = new QPushButton("💾 Kaydet");
+    QPushButton *btnIptal  = new QPushButton("✖ İptal");
+
+    btnKaydet->setMinimumHeight(38);
+    btnIptal->setMinimumHeight(38);
+
+    btnKaydet->setStyleSheet("QPushButton { background-color: #0078D7; color: white; "
+                             "font-weight: bold; border-radius: 7px; }"
+                             "QPushButton:hover { background-color: #005a9e; }");
+    btnIptal->setStyleSheet("QPushButton { background-color: #9ca3af; color: white; "
+                            "font-weight: bold; border-radius: 7px; }"
+                            "QPushButton:hover { background-color: #6b7280; }");
+
+    butonLayout->addWidget(btnKaydet);
+    butonLayout->addWidget(btnIptal);
+    anaLayout->addLayout(butonLayout);
+
+    connect(btnIptal, &QPushButton::clicked, dialog, &QDialog::reject);
+
+    connect(btnKaydet, &QPushButton::clicked, dialog, [=]() {
+        QString yeniBaslik   = txtBaslik->text().trimmed();
+        QString yeniFiyatStr = txtFiyat->text().trimmed();
+        QString yeniKategori = cmbKategori->currentText();
+        QString yeniAciklama = txtAciklama->toPlainText().trimmed();
+
+        if (yeniBaslik.isEmpty()) {
+            QMessageBox::warning(dialog, "Hata", "Başlık boş bırakılamaz!");
+            return;
+        }
+        bool ok;
+        double yeniFiyat = yeniFiyatStr.toDouble(&ok);
+        if (!ok || yeniFiyat <= 0) {
+            QMessageBox::warning(dialog, "Hata", "Geçerli bir fiyat giriniz!");
+            return;
+        }
+
+        QSqlQuery guncelle(DatabaseManager::getInstance()->getDatabase());
+        guncelle.prepare("UPDATE Ilan SET baslik = :b, fiyat = :f, kategori = :k, aciklama = :a "
+                         "WHERE ilanNo = :id");
+        guncelle.bindValue(":b",  yeniBaslik);
+        guncelle.bindValue(":f",  yeniFiyat);
+        guncelle.bindValue(":k",  yeniKategori);
+        guncelle.bindValue(":a",  yeniAciklama);
+        guncelle.bindValue(":id", ilanNo);
+
+        if (guncelle.exec()) {
+            QMessageBox::information(dialog, "Başarılı", "İlan başarıyla güncellendi!");
+            dialog->accept();
+        } else {
+            QMessageBox::critical(dialog, "Hata", "Güncelleme başarısız!\n" + guncelle.lastError().text());
+        }
+    });
+
+    connect(dialog, &QDialog::accepted, this, &Profil::profilIlanlariniYukle);
+
+    dialog->exec();
+}
+
+// ──────────────────────────────────────────────────────────────
+// İLAN SİL
+// ──────────────────────────────────────────────────────────────
 void Profil::on_btnIlanSil_clicked() {
     QListWidgetItem *seciliItem = ui->listProfilIlanlar->currentItem();
-
     if (!seciliItem) {
         QMessageBox::warning(this, "Uyarı", "Lütfen önce silinecek ilanı seçin!");
         return;
     }
 
-    // 1. ONAY KUTUSU AYARLARI
+    QString stil = "QMessageBox { background-color: #ffffff; }"
+                   "QLabel { color: #000000; font-size: 11pt; font-weight: bold; }"
+                   "QPushButton { color: #000000; background-color: #e1e1e1; border: 1px solid #adadad; "
+                   "padding: 5px; min-width: 80px; border-radius: 4px; }";
+
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("Onay");
     msgBox.setText("Bu ilanı silmek istediğinize emin misiniz?");
     msgBox.setIcon(QMessageBox::Question);
-    QPushButton *evetButonu = msgBox.addButton("Evet", QMessageBox::YesRole);
-    QPushButton *hayirButonu = msgBox.addButton("Hayır", QMessageBox::NoRole);
-
-    // Siyah yazı ve beyaz arka plan stili
-    QString stil = "QMessageBox { background-color: #ffffff; }"
-                   "QLabel { color: #000000; font-size: 11pt; font-weight: bold; }"
-                   "QPushButton { color: #000000; background-color: #e1e1e1; border: 1px solid #adadad; padding: 5px; min-width: 80px; border-radius: 4px; }";
+    QPushButton *evetButonu  = msgBox.addButton("Evet",  QMessageBox::YesRole);
+    msgBox.addButton("Hayır", QMessageBox::NoRole);
     msgBox.setStyleSheet(stil);
     msgBox.exec();
 
@@ -102,22 +241,16 @@ void Profil::on_btnIlanSil_clicked() {
         query.bindValue(":id", id);
 
         if (query.exec()) {
-            // 2. BAŞARILI MESAJI (Görüntüdeki ekranın renkli hali)
             QMessageBox infoBox(this);
             infoBox.setWindowTitle("Başarılı");
             infoBox.setText("İlan başarıyla silindi.");
             infoBox.setIcon(QMessageBox::Information);
-
-            // Tamam butonunu siyah yapalım
-            QPushButton *okButonu = infoBox.addButton("Tamam", QMessageBox::AcceptRole);
-            infoBox.setStyleSheet(stil); // Aynı siyah-beyaz stili buna da uyguluyoruz
-
+            infoBox.addButton("Tamam", QMessageBox::AcceptRole);
+            infoBox.setStyleSheet(stil);
             infoBox.exec();
-
-            profilIlanlariniYukle(); // Listeyi yenile
+            profilIlanlariniYukle();
         } else {
-            // Hata mesajı gerekirse onu da renklendirebilirsin
-            qDebug() << "Hata:" << query.lastError().text();
+            qDebug() << "Silme hatası:" << query.lastError().text();
         }
     }
 }

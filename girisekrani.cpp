@@ -2,6 +2,7 @@
 #include "ui_girisekrani.h"
 #include "kayitekrani.h"
 #include "anasayfa.h"
+#include "databasemanager.h" // DÜZELTME: Veritabanı yöneticisi eklendi
 #include <QMessageBox>
 #include <QSqlQuery>
 
@@ -48,12 +49,21 @@ void GirisEkrani::on_btnGirisYap_clicked()
     // Sorgu çalıştıysa ve eşleşen bir kayıt (.next()) bulunduysa:
     if (query.exec() && query.next()) {
 
-        // Araya giren mesaj kutusu kaldırıldı.
-        // Doğrudan Ana Sayfaya geçiş yapılıyor.
+        // ---------------------------------------------------------
+        // DÜZELTME: Giriş yapan kullanıcının ID'sini veritabanından
+        // çekip sisteme "Aktif Kullanıcı" olarak kaydediyoruz.
+        int girisYapanID = query.value("kullaniciID").toInt();
+        DatabaseManager::getInstance()->setAktifKullaniciID(girisYapanID);
+        // ---------------------------------------------------------
+
+        // Veritabanından kullanıcının adını çekip karşılama mesajı veriyoruz
+        QString ad = query.value("kullaniciAdi").toString();
+        QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");
+
+        // Ana Sayfaya geçiş
         AnaSayfa *ana = new AnaSayfa();
         ana->show();
         this->close();
-
     } else {
         // Kayıt bulunamadıysa:
         QMessageBox::critical(this, "Hata", "E-posta veya şifre hatalı!");
