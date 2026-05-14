@@ -16,6 +16,8 @@ private slots:
     void on_btnYayinla_clicked();
     void on_btnFotoEkle_clicked();
     void on_btnIptal_clicked();
+    void on_btnStokArttir_clicked();
+    void on_btnStokAzalt_clicked();
 
 private:
     Ui::IlanEkle *ui;

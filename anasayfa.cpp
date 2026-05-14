@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QPixmap>
 #include <QScrollArea>
+#include <QFrame>
 
 // ──────────────────────────────────────────────────────────────
 // CONSTRUCTOR
@@ -49,13 +50,13 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
         int     ilanNo   = query.value("ilanNo").toInt();
         QString baslik   = query.value("baslik").toString();
         double  fiyatVal = query.value("fiyat").toDouble();
-        QString fiyat    = QString("%L1").arg(fiyatVal, 0, 'f', 0); // ör: 1.200.000
+        QString fiyat    = QString("%L1").arg(fiyatVal, 0, 'f', 0);
         QString fotoYolu = query.value("fotografYolu").toString();
 
         QListWidgetItem *item = new QListWidgetItem();
         item->setText(baslik + "\n" + fiyat + " TL");
         item->setTextAlignment(Qt::AlignCenter);
-        item->setData(Qt::UserRole, ilanNo); // Detay için ilanNo sakla
+        item->setData(Qt::UserRole, ilanNo);
 
         if (!fotoYolu.isEmpty()) {
             item->setIcon(QIcon(fotoYolu));
@@ -109,11 +110,10 @@ void AnaSayfa::kategoriIlanlariYukle(const QString &kategori) {
 
 // ──────────────────────────────────────────────────────────────
 // ARAMA KUTUSU → CANLI FİLTRELEME
-// Başlığında aranan kelime geçen ilanları gösterir
 // ──────────────────────────────────────────────────────────────
 void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     if (arananKelime.isEmpty()) {
-        ilanlariYukle(); // Kutu boşsa tüm ilanları göster
+        ilanlariYukle();
         return;
     }
 
@@ -122,7 +122,6 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // LIKE ile başlıkta arama yap (büyük/küçük harf duyarsız)
     query.prepare("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan "
                   "WHERE baslik LIKE :kelime");
     query.bindValue(":kelime", "%" + arananKelime + "%");
@@ -144,7 +143,9 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT baslik, fiyat, kategori, aciklama, fotografYolu FROM Ilan WHERE ilanNo = :id");
+    // stokAdedi de sorguya eklendi
+    query.prepare("SELECT baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu "
+                  "FROM Ilan WHERE ilanNo = :id");
     query.bindValue(":id", ilanNo);
 
     if (!query.exec() || !query.next()) {
@@ -152,16 +153,17 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         return;
     }
 
-    QString baslik   = query.value("baslik").toString();
-    QString fiyat    = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0); // ör: 1.200.000
-    QString kategori = query.value("kategori").toString();
-    QString aciklama = query.value("aciklama").toString();
-    QString fotoYolu = query.value("fotografYolu").toString();
+    QString baslik    = query.value("baslik").toString();
+    QString fiyat     = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0);
+    QString kategori  = query.value("kategori").toString();
+    QString aciklama  = query.value("aciklama").toString();
+    int     stokAdedi = query.value("stokAdedi").toInt();
+    QString fotoYolu  = query.value("fotografYolu").toString();
 
     // ── Detay Penceresini Oluştur ──
     QDialog *detay = new QDialog(this);
     detay->setWindowTitle("İlan Detayı");
-    detay->setMinimumSize(500, 450);
+    detay->setMinimumSize(500, 500);
     detay->setStyleSheet("background-color: #1e1e1e; color: white;");
     detay->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -196,6 +198,24 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     lblKategori->setStyleSheet("font-size: 13px; color: #aaaaaa;");
     anaLayout->addWidget(lblKategori);
 
+    // ── STOK BİLGİSİ ──
+    QString stokRenk;
+    QString stokMetin;
+    if (stokAdedi <= 0) {
+        stokRenk = "#f44336"; // kırmızı
+        stokMetin = "❌ Stokta Yok";
+    } else if (stokAdedi <= 5) {
+        stokRenk = "#FF9F00"; // turuncu (az stok uyarısı)
+        stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet (Son ürünler!)";
+    } else {
+        stokRenk = "#4CAF50"; // yeşil
+        stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet";
+    }
+
+    QLabel *lblStok = new QLabel(stokMetin);
+    lblStok->setStyleSheet(QString("font-size: 14px; font-weight: bold; color: %1;").arg(stokRenk));
+    anaLayout->addWidget(lblStok);
+
     // Ayırıcı çizgi
     QFrame *cizgi = new QFrame();
     cizgi->setFrameShape(QFrame::HLine);
@@ -229,7 +249,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     connect(btnKapat, &QPushButton::clicked, detay, &QDialog::close);
     anaLayout->addWidget(btnKapat);
 
-    detay->exec(); // Modal olarak aç
+    detay->exec();
 }
 
 // ──────────────────────────────────────────────────────────────
