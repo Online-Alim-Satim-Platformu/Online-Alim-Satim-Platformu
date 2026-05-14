@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +12,7 @@ SOURCES += \
     ilanfactory.cpp \
     listingcontroller.cpp \
     ListingDAO.cpp \
+    DatabaseManager.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -22,6 +23,7 @@ HEADERS += \
     ilanfactory.h \
     listingcontroller.h \
     ListingDAO.h \
+    DatabaseManager.h \
     mainwindow.h
 
 FORMS += \

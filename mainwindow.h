@@ -2,11 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "ListingController.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -18,9 +17,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_2_clicked();
+    void on_btnListele_clicked();
+    void on_btnEkle_clicked();
+    void on_btnSil_clicked();
 
 private:
     Ui::MainWindow *ui;
+    ListingController* controller;
+    void refreshList();
 };
 #endif // MAINWINDOW_H

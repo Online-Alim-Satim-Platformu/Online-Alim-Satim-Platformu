@@ -11,9 +11,11 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -22,28 +24,48 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
-    QWidget *widget;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
+    QVBoxLayout *verticalLayout;
+    QListWidget *listWidget;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *btnListele;
+    QPushButton *btnEkle;
+    QPushButton *btnSil;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1243, 877);
+        MainWindow->resize(800, 600);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
-        widget = new QWidget(centralwidget);
-        widget->setObjectName("widget");
-        widget->setGeometry(QRect(360, 440, 120, 80));
+        verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setObjectName("verticalLayout");
+        listWidget = new QListWidget(centralwidget);
+        listWidget->setObjectName("listWidget");
+
+        verticalLayout->addWidget(listWidget);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        btnListele = new QPushButton(centralwidget);
+        btnListele->setObjectName("btnListele");
+
+        horizontalLayout->addWidget(btnListele);
+
+        btnEkle = new QPushButton(centralwidget);
+        btnEkle->setObjectName("btnEkle");
+
+        horizontalLayout->addWidget(btnEkle);
+
+        btnSil = new QPushButton(centralwidget);
+        btnSil->setObjectName("btnSil");
+
+        horizontalLayout->addWidget(btnSil);
+
+
+        verticalLayout->addLayout(horizontalLayout);
+
         MainWindow->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1243, 26));
-        MainWindow->setMenuBar(menubar);
-        statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName("statusbar");
-        MainWindow->setStatusBar(statusbar);
 
         retranslateUi(MainWindow);
 
@@ -52,7 +74,10 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Online Al\304\261m Sat\304\261m Platformu", nullptr));
+        btnListele->setText(QCoreApplication::translate("MainWindow", "\304\260lanlar\304\261 Listele", nullptr));
+        btnEkle->setText(QCoreApplication::translate("MainWindow", "\303\226rnek Emlak Ekle", nullptr));
+        btnSil->setText(QCoreApplication::translate("MainWindow", "Se\303\247ileni Sil", nullptr));
     } // retranslateUi
 
 };
