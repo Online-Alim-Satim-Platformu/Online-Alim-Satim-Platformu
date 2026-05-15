@@ -33,7 +33,11 @@ bool DatabaseManager::baglantiKur() {
     query.exec("CREATE TABLE IF NOT EXISTS Ilan ("
                "ilanNo INTEGER PRIMARY KEY AUTOINCREMENT, "
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
-               "stokAdedi INTEGER, fotografYolu TEXT)");
+               "stokAdedi INTEGER, fotografYolu TEXT, "
+               "kullaniciId INTEGER)");
+
+    // Mevcut veritabanında kullaniciId kolonu yoksa ekle (migration)
+    query.exec("ALTER TABLE Ilan ADD COLUMN kullaniciId INTEGER");
 
     // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
     QSqlQuery checkQuery(db);

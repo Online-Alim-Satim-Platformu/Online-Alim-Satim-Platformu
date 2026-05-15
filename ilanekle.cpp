@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QDir>
 #include <QDateTime>
+#include "session.h"
 
 IlanEkle::IlanEkle(QWidget *parent) : QWidget(parent), ui(new Ui::IlanEkle) {
     ui->setupUi(this);
@@ -77,14 +78,15 @@ void IlanEkle::on_btnYayinla_clicked() {
 
     // Doğru bağlantı üzerinden sorguyu hazırla
     QSqlQuery query(db);
-    query.prepare("INSERT INTO Ilan (baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu) "
-                  "VALUES (:b, :f, :k, :a, :s, :foto)");
+    query.prepare("INSERT INTO Ilan (baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu, kullaniciId) "
+                  "VALUES (:b, :f, :k, :a, :s, :foto, :uid)");
     query.bindValue(":b", baslik);
     query.bindValue(":f", fiyat);
     query.bindValue(":k", ui->cmbKategori->currentText());
     query.bindValue(":a", ui->txtAciklama->toPlainText());
     query.bindValue(":s", stokAdedi);
     query.bindValue(":foto", kaydedilecekAdres);
+    query.bindValue(":uid", aktifKullaniciId);
 
     // Sorguyu çalıştır ve sonucu kontrol et
     if (query.exec()) {

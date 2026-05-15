@@ -3,7 +3,8 @@
 #include "ilanekle.h"
 #include "databasemanager.h"
 #include "profil.h"
-#include "girisekrani.h"          // Çıkış yapınca giriş ekranını açmak için
+#include "session.h"
+#include "girisekrani.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
@@ -17,11 +18,7 @@
 #include <QPushButton>
 #include <QPixmap>
 #include <QScrollArea>
-#include <QFrame>
 
-// ──────────────────────────────────────────────────────────────
-// CONSTRUCTOR
-// ──────────────────────────────────────────────────────────────
 AnaSayfa::AnaSayfa(QWidget *parent) : QWidget(parent), ui(new Ui::AnaSayfa) {
     ui->setupUi(this);
 
@@ -34,9 +31,6 @@ AnaSayfa::~AnaSayfa() {
     delete ui;
 }
 
-// ──────────────────────────────────────────────────────────────
-// ORTAK LİSTE DOLDURMA FONKSİYONU
-// ──────────────────────────────────────────────────────────────
 void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
     ui->listVitrin->clear();
 
@@ -69,9 +63,6 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// TÜM İLANLARI YÜKLE
-// ──────────────────────────────────────────────────────────────
 void AnaSayfa::ilanlariYukle() {
     ui->lblVitrinBaslik->setText("Anasayfa Vitrini");
     ui->txtSearch->clear();
@@ -79,6 +70,7 @@ void AnaSayfa::ilanlariYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
+    // Herkes TÜM ilanları görür
     if (!query.exec("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan")) {
         qDebug() << "Vitrin yükleme hatası:" << query.lastError().text();
         return;
@@ -87,9 +79,6 @@ void AnaSayfa::ilanlariYukle() {
     listeyiDoldur(query);
 }
 
-// ──────────────────────────────────────────────────────────────
-// KATEGORİYE GÖRE FİLTRELE
-// ──────────────────────────────────────────────────────────────
 void AnaSayfa::kategoriIlanlariYukle(const QString &kategori) {
     ui->lblVitrinBaslik->setText(kategori + " İlanları");
     ui->txtSearch->clear();
@@ -108,9 +97,6 @@ void AnaSayfa::kategoriIlanlariYukle(const QString &kategori) {
     listeyiDoldur(query);
 }
 
-// ──────────────────────────────────────────────────────────────
-// ARAMA KUTUSU → CANLI FİLTRELEME
-// ──────────────────────────────────────────────────────────────
 void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     if (arananKelime.isEmpty()) {
         ilanlariYukle();
@@ -122,8 +108,7 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan "
-                  "WHERE baslik LIKE :kelime");
+    query.prepare("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan WHERE baslik LIKE :kelime");
     query.bindValue(":kelime", "%" + arananKelime + "%");
 
     if (!query.exec()) {
@@ -134,17 +119,19 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     listeyiDoldur(query);
 }
 
-// ──────────────────────────────────────────────────────────────
-// İLAN DETAY POPUP (Stok bilgisi ile)
-// ──────────────────────────────────────────────────────────────
 void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     int ilanNo = item->data(Qt::UserRole).toInt();
 
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT baslik, fiyat, kategori, aciklama, stokAdedi, fotografYolu "
-                  "FROM Ilan WHERE ilanNo = :id");
+    // JOIN ile ekleyenin adını da çek
+    query.prepare(
+        "SELECT i.baslik, i.fiyat, i.kategori, i.aciklama, i.fotografYolu, i.stokAdedi, "
+        "       k.kullaniciAdi AS ekleyen, k.email AS ekleyenEmail "
+        "FROM Ilan i "
+        "LEFT JOIN Kullanici k ON i.kullaniciId = k.kullaniciId "
+        "WHERE i.ilanNo = :id");
     query.bindValue(":id", ilanNo);
 
     if (!query.exec() || !query.next()) {
@@ -152,17 +139,18 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         return;
     }
 
-    QString baslik    = query.value("baslik").toString();
-    QString fiyat     = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0);
-    QString kategori  = query.value("kategori").toString();
-    QString aciklama  = query.value("aciklama").toString();
-    int     stokAdedi = query.value("stokAdedi").toInt();
-    QString fotoYolu  = query.value("fotografYolu").toString();
+    QString baslik        = query.value("baslik").toString();
+    QString fiyat         = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0);
+    QString kategori      = query.value("kategori").toString();
+    QString aciklama      = query.value("aciklama").toString();
+    QString fotoYolu      = query.value("fotografYolu").toString();
+    int     stok          = query.value("stokAdedi").toInt();
+    QString ekleyen       = query.value("ekleyen").toString();
+    QString ekleyenEmail  = query.value("ekleyenEmail").toString();
 
-    // ── Detay Penceresini Oluştur ──
     QDialog *detay = new QDialog(this);
     detay->setWindowTitle("İlan Detayı");
-    detay->setMinimumSize(500, 500);
+    detay->setMinimumSize(500, 480);
     detay->setStyleSheet("background-color: #1e1e1e; color: white;");
     detay->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -170,12 +158,11 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     anaLayout->setSpacing(12);
     anaLayout->setContentsMargins(20, 20, 20, 20);
 
-    // Fotoğraf
     if (!fotoYolu.isEmpty()) {
         QLabel *lblFoto = new QLabel();
         QPixmap px(fotoYolu);
         if (!px.isNull()) {
-            lblFoto->setPixmap(px.scaled(460, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            lblFoto->setPixmap(px.scaled(460, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
             lblFoto->setAlignment(Qt::AlignCenter);
             anaLayout->addWidget(lblFoto);
         }
@@ -190,27 +177,21 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     lblFiyat->setStyleSheet("font-size: 16px; font-weight: bold; color: #4CAF50;");
     anaLayout->addWidget(lblFiyat);
 
+    QLabel *lblStok = new QLabel("📦 Stok Adedi: " + QString::number(stok));
+    lblStok->setStyleSheet("font-size: 14px; font-weight: bold; color: #FF9F00;");
+    anaLayout->addWidget(lblStok);
+
     QLabel *lblKategori = new QLabel("📂 Kategori: " + kategori);
     lblKategori->setStyleSheet("font-size: 13px; color: #aaaaaa;");
     anaLayout->addWidget(lblKategori);
 
-    // Stok Bilgisi
-    QString stokRenk;
-    QString stokMetin;
-    if (stokAdedi <= 0) {
-        stokRenk = "#f44336";
-        stokMetin = "❌ Stokta Yok";
-    } else if (stokAdedi <= 5) {
-        stokRenk = "#FF9F00";
-        stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet (Son ürünler!)";
-    } else {
-        stokRenk = "#4CAF50";
-        stokMetin = "📦 Stok: " + QString::number(stokAdedi) + " adet";
+    // ── İlanı ekleyenin bilgisi ──
+    if (!ekleyen.isEmpty()) {
+        QLabel *lblEkleyen = new QLabel("👤 İlanı Ekleyen: " + ekleyen +
+                                        (ekleyenEmail.isEmpty() ? "" : "  (" + ekleyenEmail + ")"));
+        lblEkleyen->setStyleSheet("font-size: 13px; color: #90caf9; font-weight: bold;");
+        anaLayout->addWidget(lblEkleyen);
     }
-
-    QLabel *lblStok = new QLabel(stokMetin);
-    lblStok->setStyleSheet(QString("font-size: 14px; font-weight: bold; color: %1;").arg(stokRenk));
-    anaLayout->addWidget(lblStok);
 
     QFrame *cizgi = new QFrame();
     cizgi->setFrameShape(QFrame::HLine);
@@ -244,10 +225,6 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     detay->exec();
 }
 
-// ──────────────────────────────────────────────────────────────
-// BUTON SLOTLARI
-// ──────────────────────────────────────────────────────────────
-
 void AnaSayfa::on_btnTumVitrin_clicked()    { ilanlariYukle(); }
 void AnaSayfa::on_btnEmlak_clicked()        { kategoriIlanlariYukle("Emlak");      }
 void AnaSayfa::on_btnVasita_clicked()       { kategoriIlanlariYukle("Vasıta");     }
@@ -269,8 +246,9 @@ void AnaSayfa::on_btnProfil_clicked() {
     p->show();
 }
 
-// ─── YENİ EKLENEN ÇIKIŞ YAP SLOTU ───
 void AnaSayfa::on_btnCikisYap_clicked() {
+    aktifKullaniciId = 0;
+
     GirisEkrani *giris = new GirisEkrani();
     giris->show();
     this->close();

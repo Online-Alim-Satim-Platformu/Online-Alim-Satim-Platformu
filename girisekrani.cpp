@@ -2,6 +2,7 @@
 #include "ui_girisekrani.h"
 #include "kayitekrani.h"
 #include "anasayfa.h"
+#include "session.h"
 #include <QMessageBox>
 #include <QSqlQuery>
 
@@ -11,7 +12,6 @@ GirisEkrani::GirisEkrani(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Büyü burada gerçekleşiyor: Şifre veya E-posta kutusundayken "Enter" tuşuna basılırsa Giriş Yap butonunu tetikle!
     connect(ui->txtSifre, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
     connect(ui->txtEmail, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
 }
@@ -33,30 +33,29 @@ void GirisEkrani::on_btnGirisYap_clicked()
     QString email = ui->txtEmail->text();
     QString sifre = ui->txtSifre->text();
 
-    // 1. Kutucuklar boş mu kontrolü
     if (email.isEmpty() || sifre.isEmpty()) {
         QMessageBox::warning(this, "Uyarı", "Lütfen e-posta ve şifrenizi giriniz!");
         return;
     }
 
-    // 2. Veritabanında kullanıcıyı arama
+    // kullaniciId de SELECT'e eklendi — oturum yönetimi için
     QSqlQuery query;
-    query.prepare("SELECT * FROM Kullanici WHERE email = :email AND sifre = :sifre");
+    query.prepare("SELECT kullaniciId, kullaniciAdi FROM Kullanici "
+                  "WHERE email = :email AND sifre = :sifre");
     query.bindValue(":email", email);
     query.bindValue(":sifre", sifre);
 
-    // Sorgu çalıştıysa ve eşleşen bir kayıt (.next()) bulunduysa:
     if (query.exec() && query.next()) {
-        // Veritabanından kullanıcının adını çekip karşılama mesajı veriyoruz
+        // Global oturumu set et
+        aktifKullaniciId = query.value("kullaniciId").toInt();
+
         QString ad = query.value("kullaniciAdi").toString();
         QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");
 
-        // Ana Sayfaya geçiş
         AnaSayfa *ana = new AnaSayfa();
         ana->show();
         this->close();
     } else {
-        // Kayıt bulunamadıysa:
         QMessageBox::critical(this, "Hata", "E-posta veya şifre hatalı!");
     }
 }
