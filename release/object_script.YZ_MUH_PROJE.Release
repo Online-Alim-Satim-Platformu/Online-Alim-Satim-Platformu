@@ -1,0 +1,14 @@
+release/anasayfa.o
+release/databasemanager.o
+release/girisekrani.o
+release/ilanekle.o
+release/kayitekrani.o
+release/main.o
+release/mainwindow.o
+release/profil.o
+release/moc_anasayfa.o
+release/moc_girisekrani.o
+release/moc_ilanekle.o
+release/moc_kayitekrani.o
+release/moc_mainwindow.o
+release/moc_profil.o
