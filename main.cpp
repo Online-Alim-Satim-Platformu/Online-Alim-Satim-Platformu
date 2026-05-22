@@ -1,6 +1,9 @@
 #include "girisekrani.h"
+#include "anasayfa.h"
 #include "databasemanager.h"
+#include "session.h"
 #include <QApplication>
+#include <QSettings>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -36,8 +39,19 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    GirisEkrani w;
-    w.show();
+    QSettings settings("OnlineAlimSatim", "App");
+    int kayitliId = settings.value("oturum/kullaniciId", 0).toInt();
+
+    if (kayitliId > 0) {
+        aktifKullaniciId = kayitliId;
+        AnaSayfa *ana = new AnaSayfa();
+        ana->setAttribute(Qt::WA_DeleteOnClose);
+        ana->show();
+    } else {
+        GirisEkrani *w = new GirisEkrani();
+        w->setAttribute(Qt::WA_DeleteOnClose);
+        w->show();
+    }
 
     return a.exec();
 }

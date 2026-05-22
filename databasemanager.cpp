@@ -34,10 +34,16 @@ bool DatabaseManager::baglantiKur() {
                "ilanNo INTEGER PRIMARY KEY AUTOINCREMENT, "
                "baslik TEXT, fiyat REAL, kategori TEXT, aciklama TEXT, "
                "stokAdedi INTEGER, fotografYolu TEXT, "
+               "foto1 TEXT, foto2 TEXT, foto3 TEXT, foto4 TEXT, foto5 TEXT, "
                "kullaniciId INTEGER)");
 
-    // Mevcut veritabanında kullaniciId kolonu yoksa ekle (migration)
+    // migration — mevcut tablolara yeni kolonlar ekle (hata olursa yok sayılır)
     query.exec("ALTER TABLE Ilan ADD COLUMN kullaniciId INTEGER");
+    query.exec("ALTER TABLE Ilan ADD COLUMN foto1 TEXT");
+    query.exec("ALTER TABLE Ilan ADD COLUMN foto2 TEXT");
+    query.exec("ALTER TABLE Ilan ADD COLUMN foto3 TEXT");
+    query.exec("ALTER TABLE Ilan ADD COLUMN foto4 TEXT");
+    query.exec("ALTER TABLE Ilan ADD COLUMN foto5 TEXT");
 
     // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
     QSqlQuery checkQuery(db);

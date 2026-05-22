@@ -22,6 +22,18 @@
 AnaSayfa::AnaSayfa(QWidget *parent) : QWidget(parent), ui(new Ui::AnaSayfa) {
     ui->setupUi(this);
 
+    // Dinamik yenile butonu — sadece ikon, yazısız
+    QPushButton *btnYenile = new QPushButton(this);
+    btnYenile->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+    btnYenile->setIconSize(QSize(20, 20));
+    btnYenile->setFixedSize(35, 35);
+    btnYenile->setToolTip("Yenile");
+    btnYenile->setStyleSheet(
+        "QPushButton { background-color: #444444; border-radius: 5px; }"
+        "QPushButton:hover { background-color: #555555; }");
+    connect(btnYenile, &QPushButton::clicked, this, &AnaSayfa::ilanlariYukle);
+    ui->topBarLayout->insertWidget(2, btnYenile);  // arama kutusunun hemen sağına
+
     if (DatabaseManager::getInstance()->baglantiKur()) {
         ilanlariYukle();
     }
@@ -70,8 +82,7 @@ void AnaSayfa::ilanlariYukle() {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // Herkes TÜM ilanları görür
-    if (!query.exec("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan")) {
+    if (!query.exec("SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan")) {
         qDebug() << "Vitrin yükleme hatası:" << query.lastError().text();
         return;
     }
@@ -86,7 +97,7 @@ void AnaSayfa::kategoriIlanlariYukle(const QString &kategori) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan WHERE kategori = :kat");
+    query.prepare("SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE kategori = :kat");
     query.bindValue(":kat", kategori);
 
     if (!query.exec()) {
@@ -108,7 +119,7 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT ilanNo, baslik, fiyat, fotografYolu FROM Ilan WHERE baslik LIKE :kelime");
+    query.prepare("SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE baslik LIKE :kelime");
     query.bindValue(":kelime", "%" + arananKelime + "%");
 
     if (!query.exec()) {
@@ -125,9 +136,9 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    // JOIN ile ekleyenin adını da çek
     query.prepare(
-        "SELECT i.baslik, i.fiyat, i.kategori, i.aciklama, i.fotografYolu, i.stokAdedi, "
+        "SELECT i.baslik, i.fiyat, i.kategori, i.aciklama, i.stokAdedi, "
+        "       i.foto1, i.foto2, i.foto3, i.foto4, i.foto5, i.fotografYolu, "
         "       k.kullaniciAdi AS ekleyen, k.email AS ekleyenEmail "
         "FROM Ilan i "
         "LEFT JOIN Kullanici k ON i.kullaniciId = k.kullaniciId "
@@ -139,14 +150,25 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         return;
     }
 
-    QString baslik        = query.value("baslik").toString();
-    QString fiyat         = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0);
-    QString kategori      = query.value("kategori").toString();
-    QString aciklama      = query.value("aciklama").toString();
-    QString fotoYolu      = query.value("fotografYolu").toString();
-    int     stok          = query.value("stokAdedi").toInt();
-    QString ekleyen       = query.value("ekleyen").toString();
-    QString ekleyenEmail  = query.value("ekleyenEmail").toString();
+    QString baslik       = query.value("baslik").toString();
+    QString fiyat        = QString("%L1").arg(query.value("fiyat").toDouble(), 0, 'f', 0);
+    QString kategori     = query.value("kategori").toString();
+    QString aciklama     = query.value("aciklama").toString();
+    int     stok         = query.value("stokAdedi").toInt();
+    QString ekleyen      = query.value("ekleyen").toString();
+    QString ekleyenEmail = query.value("ekleyenEmail").toString();
+
+    // Fotoğraf listesi: foto1..foto5, yoksa fotografYolu (eski kayıtlar için)
+    QStringList fotolar;
+    const QString kolonlar[5] = {"foto1","foto2","foto3","foto4","foto5"};
+    for (const QString &k : kolonlar) {
+        QString v = query.value(k).toString();
+        if (!v.isEmpty()) fotolar << v;
+    }
+    if (fotolar.isEmpty()) {
+        QString eski = query.value("fotografYolu").toString();
+        if (!eski.isEmpty()) fotolar << eski;
+    }
 
     QDialog *detay = new QDialog(this);
     detay->setWindowTitle("İlan Detayı");
@@ -158,14 +180,48 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     anaLayout->setSpacing(12);
     anaLayout->setContentsMargins(20, 20, 20, 20);
 
-    if (!fotoYolu.isEmpty()) {
-        QLabel *lblFoto = new QLabel();
-        QPixmap px(fotoYolu);
-        if (!px.isNull()) {
-            lblFoto->setPixmap(px.scaled(460, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            lblFoto->setAlignment(Qt::AlignCenter);
-            anaLayout->addWidget(lblFoto);
-        }
+    // ── Fotoğraf Slider ──
+    if (!fotolar.isEmpty()) {
+        int *sliderIndex = new int(0);  // detay sahibi olduğundan ömrü diyaloğa bağlı
+
+        QHBoxLayout *sliderLayout = new QHBoxLayout();
+
+        QPushButton *btnGeri = new QPushButton("<");
+        btnGeri->setFixedSize(32, 80);
+        btnGeri->setStyleSheet("QPushButton{background:#333;color:white;border-radius:4px;font-weight:bold;}"
+                               "QPushButton:hover{background:#555;}");
+
+        QLabel *lblFotoSlider = new QLabel();
+        lblFotoSlider->setAlignment(Qt::AlignCenter);
+        lblFotoSlider->setMinimumSize(400, 200);
+
+        QPushButton *btnIleri = new QPushButton(">");
+        btnIleri->setFixedSize(32, 80);
+        btnIleri->setStyleSheet("QPushButton{background:#333;color:white;border-radius:4px;font-weight:bold;}"
+                                "QPushButton:hover{background:#555;}");
+
+        auto guncelleFoto = [=]() {
+            QPixmap px(fotolar[*sliderIndex]);
+            if (!px.isNull())
+                lblFotoSlider->setPixmap(px.scaled(400, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            else
+                lblFotoSlider->setText("Görsel yüklenemedi");
+            btnGeri->setEnabled(*sliderIndex > 0);
+            btnIleri->setEnabled(*sliderIndex < fotolar.size() - 1);
+        };
+
+        connect(btnGeri,  &QPushButton::clicked, detay, [=]() { --(*sliderIndex); guncelleFoto(); });
+        connect(btnIleri, &QPushButton::clicked, detay, [=]() { ++(*sliderIndex); guncelleFoto(); });
+
+        // detay kapanınca int'i temizle
+        connect(detay, &QDialog::destroyed, detay, [sliderIndex](){ delete sliderIndex; });
+
+        sliderLayout->addWidget(btnGeri);
+        sliderLayout->addWidget(lblFotoSlider, 1);
+        sliderLayout->addWidget(btnIleri);
+        anaLayout->addLayout(sliderLayout);
+
+        guncelleFoto();
     }
 
     QLabel *lblBaslik = new QLabel(baslik);

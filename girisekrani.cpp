@@ -5,12 +5,16 @@
 #include "session.h"
 #include <QMessageBox>
 #include <QSqlQuery>
+#include <QSettings>
 
 GirisEkrani::GirisEkrani(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::GirisEkrani)
 {
     ui->setupUi(this);
+
+    QSettings settings("OnlineAlimSatim", "App");
+    ui->chkOturumAcikKalsin->setChecked(settings.value("oturum/hatirla", false).toBool());
 
     connect(ui->txtSifre, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
     connect(ui->txtEmail, &QLineEdit::returnPressed, this, &GirisEkrani::on_btnGirisYap_clicked);
@@ -46,8 +50,16 @@ void GirisEkrani::on_btnGirisYap_clicked()
     query.bindValue(":sifre", sifre);
 
     if (query.exec() && query.next()) {
-        // Global oturumu set et
         aktifKullaniciId = query.value("kullaniciId").toInt();
+
+        QSettings settings("OnlineAlimSatim", "App");
+        if (ui->chkOturumAcikKalsin->isChecked()) {
+            settings.setValue("oturum/kullaniciId", aktifKullaniciId);
+            settings.setValue("oturum/hatirla", true);
+        } else {
+            settings.remove("oturum/kullaniciId");
+            settings.setValue("oturum/hatirla", false);
+        }
 
         QString ad = query.value("kullaniciAdi").toString();
         QMessageBox::information(this, "Başarılı", "Hoşgeldin, " + ad + "!");

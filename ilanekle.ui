@@ -46,39 +46,40 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="fotoLayout">
-     <item>
-      <widget class="QLabel" name="lblFotoOnizleme">
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>150</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string>background-color: #e0e0e0; border: 2px dashed #aaa;</string>
-       </property>
-       <property name="text">
-        <string>Fotoğraf Yok</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnFotoEkle">
-       <property name="minimumSize">
-        <size>
-         <width>120</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Fotoğraf Seç...</string>
-       </property>
-      </widget>
-     </item>
+    <widget class="QLabel" name="lblFotoBaslik">
+     <property name="text">
+      <string>Fotoğraflar (Maks 5):</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoSatir1">
+     <item><widget class="QLabel" name="lblFoto1"><property name="text"><string>Foto 1: —</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnFoto1"><property name="minimumSize"><size><width>70</width><height>28</height></size></property><property name="text"><string>Seç...</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoSatir2">
+     <item><widget class="QLabel" name="lblFoto2"><property name="text"><string>Foto 2: —</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnFoto2"><property name="minimumSize"><size><width>70</width><height>28</height></size></property><property name="text"><string>Seç...</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoSatir3">
+     <item><widget class="QLabel" name="lblFoto3"><property name="text"><string>Foto 3: —</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnFoto3"><property name="minimumSize"><size><width>70</width><height>28</height></size></property><property name="text"><string>Seç...</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoSatir4">
+     <item><widget class="QLabel" name="lblFoto4"><property name="text"><string>Foto 4: —</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnFoto4"><property name="minimumSize"><size><width>70</width><height>28</height></size></property><property name="text"><string>Seç...</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="fotoSatir5">
+     <item><widget class="QLabel" name="lblFoto5"><property name="text"><string>Foto 5: —</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnFoto5"><property name="minimumSize"><size><width>70</width><height>28</height></size></property><property name="text"><string>Seç...</string></property></widget></item>
     </layout>
    </item>
    <item>
