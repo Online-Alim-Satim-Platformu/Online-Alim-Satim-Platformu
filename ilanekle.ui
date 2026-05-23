@@ -6,14 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>850</width>
     <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Yeni İlan Ekle</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_Main">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>15</number>
    </property>
@@ -291,6 +293,12 @@
       <string>İlanı Yayınla</string>
      </property>
     </widget>
+   </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="layoutOzellikler">
+    </layout>
    </item>
   </layout>
  </widget>

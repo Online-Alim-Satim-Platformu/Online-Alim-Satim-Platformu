@@ -29,10 +29,13 @@ private slots:
 
     void on_txtSearch_textChanged(const QString &arananKelime);
     void on_listVitrin_itemDoubleClicked(QListWidgetItem *item);
+    void on_btnFiltrele_clicked();
 
 private:
     Ui::AnaSayfa *ui;
     void listeyiDoldur(QSqlQuery &query);
+    QPushButton *btnFiltrele;
+    QString guncelKategori;
 };
 
 #endif // ANASAYFA_H

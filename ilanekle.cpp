@@ -28,6 +28,9 @@ IlanEkle::IlanEkle(QWidget *parent) : QWidget(parent), ui(new Ui::IlanEkle) {
             "QPushButton:hover { background-color: #4f46e5; }");
         connect(btnler[i], &QPushButton::clicked, this, [this, i]() { fotoSec(i); });
     }
+
+    connect(ui->cmbKategori, &QComboBox::currentTextChanged, this, &IlanEkle::on_cmbKategori_currentTextChanged);
+    on_cmbKategori_currentTextChanged(ui->cmbKategori->currentText());
 }
 
 IlanEkle::~IlanEkle() {
@@ -96,10 +99,18 @@ void IlanEkle::on_btnYayinla_clicked() {
         }
     }
 
+    QStringList ozellikList;
+    for (auto it = ozellikAlanlari.begin(); it != ozellikAlanlari.end(); ++it) {
+        if (!it.value()->text().isEmpty()) {
+            ozellikList << it.key() + ": " + it.value()->text();
+        }
+    }
+    QString ozelliklerStr = ozellikList.join(" | ");
+
     QSqlQuery query(db);
     query.prepare("INSERT INTO Ilan (baslik, fiyat, kategori, aciklama, stokAdedi, "
-                  "foto1, foto2, foto3, foto4, foto5, kullaniciId) "
-                  "VALUES (:b, :f, :k, :a, :s, :f1, :f2, :f3, :f4, :f5, :uid)");
+                  "foto1, foto2, foto3, foto4, foto5, kullaniciId, ozellikler) "
+                  "VALUES (:b, :f, :k, :a, :s, :f1, :f2, :f3, :f4, :f5, :uid, :ozel)");
     query.bindValue(":b",   baslik);
     query.bindValue(":f",   fiyat);
     query.bindValue(":k",   ui->cmbKategori->currentText());
@@ -111,6 +122,7 @@ void IlanEkle::on_btnYayinla_clicked() {
     query.bindValue(":f4",  kayitliYollar[3]);
     query.bindValue(":f5",  kayitliYollar[4]);
     query.bindValue(":uid", aktifKullaniciId);
+    query.bindValue(":ozel", ozelliklerStr);
 
     // Sorguyu çalıştır ve sonucu kontrol et
     if (query.exec()) {
@@ -123,4 +135,61 @@ void IlanEkle::on_btnYayinla_clicked() {
 
 void IlanEkle::on_btnIptal_clicked() {
     this->close();
+}
+
+void IlanEkle::ozellikleriTemizle() {
+    QLayoutItem *child;
+    while ((child = ui->layoutOzellikler->takeAt(0)) != nullptr) {
+        if (child->widget()) delete child->widget();
+        else if (child->layout()) {
+            QLayoutItem *subchild;
+            while ((subchild = child->layout()->takeAt(0)) != nullptr) {
+                if (subchild->widget()) delete subchild->widget();
+                delete subchild;
+            }
+            delete child->layout();
+        }
+        delete child;
+    }
+    ozellikAlanlari.clear();
+}
+
+void IlanEkle::ozellikEkle(const QString &label) {
+    QHBoxLayout *hLayout = new QHBoxLayout();
+    QLabel *lbl = new QLabel(label + ":", this);
+    lbl->setStyleSheet("font-weight: bold;");
+    QLineEdit *txt = new QLineEdit(this);
+    hLayout->addWidget(lbl);
+    hLayout->addWidget(txt);
+    ui->layoutOzellikler->addLayout(hLayout);
+    ozellikAlanlari[label] = txt;
+}
+
+void IlanEkle::on_cmbKategori_currentTextChanged(const QString &kategori) {
+    ozellikleriTemizle();
+    
+    QLabel *baslik = new QLabel("<b>" + kategori + " Özellikleri</b>", this);
+    baslik->setStyleSheet("font-size: 16px; color: #4CAF50; margin-bottom: 10px;");
+    ui->layoutOzellikler->addWidget(baslik);
+
+    if (kategori == "Emlak") {
+        ozellikEkle("Bina Yaşı");
+        ozellikEkle("Metrekare");
+        ozellikEkle("Oda Sayısı (Örn: 3+1)");
+        ozellikEkle("Bulunduğu Kat");
+    } else if (kategori == "Vasıta") {
+        ozellikEkle("Marka");
+        ozellikEkle("Model");
+        ozellikEkle("Yıl");
+        ozellikEkle("Kilometre");
+    } else if (kategori == "Elektronik") {
+        ozellikEkle("Marka");
+        ozellikEkle("Durum (Sıfır/İkinci El)");
+        ozellikEkle("Garanti (Var/Yok)");
+    } else if (kategori == "Giyim") {
+        ozellikEkle("Beden");
+        ozellikEkle("Renk");
+        ozellikEkle("Durum");
+    }
+    ui->layoutOzellikler->addStretch();
 }

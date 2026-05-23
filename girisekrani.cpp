@@ -3,6 +3,7 @@
 #include "kayitekrani.h"
 #include "anasayfa.h"
 #include "session.h"
+#include "sifremiunuttum.h"
 #include <QMessageBox>
 #include <QSqlQuery>
 #include <QSettings>
@@ -30,6 +31,13 @@ void GirisEkrani::on_btnHesapAc_clicked()
     KayitEkrani *kayitPenceresi = new KayitEkrani();
     kayitPenceresi->show();
     this->close();
+}
+
+void GirisEkrani::on_btnSifremiUnuttum_clicked()
+{
+    SifremiUnuttum *s = new SifremiUnuttum();
+    s->setAttribute(Qt::WA_DeleteOnClose);
+    s->show();
 }
 
 void GirisEkrani::on_btnGirisYap_clicked()

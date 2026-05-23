@@ -22,6 +22,13 @@ private:
     Ui::IlanEkle *ui;
     QString secilenFotolar[5];
     void fotoSec(int index);
+
+    QMap<QString, class QLineEdit*> ozellikAlanlari;
+    void ozellikleriTemizle();
+    void ozellikEkle(const QString &label);
+
+private slots:
+    void on_cmbKategori_currentTextChanged(const QString &kategori);
 };
 
 #endif // ILANEKLE_H

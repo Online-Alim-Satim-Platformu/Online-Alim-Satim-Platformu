@@ -18,6 +18,7 @@ public:
 private slots:
     void on_btnHesapAc_clicked();
     void on_btnGirisYap_clicked();
+    void on_btnSifremiUnuttum_clicked();
 
 private:
     Ui::GirisEkrani *ui;

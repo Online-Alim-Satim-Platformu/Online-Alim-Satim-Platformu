@@ -18,6 +18,8 @@
 #include <QPushButton>
 #include <QPixmap>
 #include <QScrollArea>
+#include <QFormLayout>
+#include <QLineEdit>
 
 AnaSayfa::AnaSayfa(QWidget *parent) : QWidget(parent), ui(new Ui::AnaSayfa) {
     ui->setupUi(this);
@@ -33,6 +35,16 @@ AnaSayfa::AnaSayfa(QWidget *parent) : QWidget(parent), ui(new Ui::AnaSayfa) {
         "QPushButton:hover { background-color: #555555; }");
     connect(btnYenile, &QPushButton::clicked, this, &AnaSayfa::ilanlariYukle);
     ui->topBarLayout->insertWidget(2, btnYenile);  // arama kutusunun hemen sağına
+
+    btnFiltrele = new QPushButton(" Filtrele", this);
+    btnFiltrele->setIcon(style()->standardIcon(QStyle::SP_FileDialogDetailedView));
+    btnFiltrele->setFixedHeight(35);
+    btnFiltrele->setStyleSheet(
+        "QPushButton { background-color: #2196F3; color: white; border-radius: 5px; padding: 0 15px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #1976D2; }");
+    btnFiltrele->hide();
+    connect(btnFiltrele, &QPushButton::clicked, this, &AnaSayfa::on_btnFiltrele_clicked);
+    ui->topBarLayout->insertWidget(3, btnFiltrele);
 
     if (DatabaseManager::getInstance()->baglantiKur()) {
         ilanlariYukle();
@@ -78,6 +90,8 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
 }
 
 void AnaSayfa::ilanlariYukle() {
+    guncelKategori = "";
+    btnFiltrele->hide();
     ui->lblVitrinBaslik->setText("Anasayfa Vitrini");
     ui->txtSearch->clear();
 
@@ -93,6 +107,8 @@ void AnaSayfa::ilanlariYukle() {
 }
 
 void AnaSayfa::kategoriIlanlariYukle(const QString &kategori) {
+    guncelKategori = kategori;
+    btnFiltrele->show();
     ui->lblVitrinBaslik->setText(kategori + " İlanları");
     ui->txtSearch->clear();
 
@@ -121,7 +137,7 @@ void AnaSayfa::on_txtSearch_textChanged(const QString &arananKelime) {
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
 
-    query.prepare("SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE baslik LIKE :kelime");
+    query.prepare("SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE baslik LIKE :kelime OR aciklama LIKE :kelime");
     query.bindValue(":kelime", "%" + arananKelime + "%");
 
     if (!query.exec()) {
@@ -140,7 +156,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
 
     query.prepare(
         "SELECT i.baslik, i.fiyat, i.kategori, i.aciklama, i.stokAdedi, "
-        "       i.foto1, i.foto2, i.foto3, i.foto4, i.foto5, i.fotografYolu, "
+        "       i.foto1, i.foto2, i.foto3, i.foto4, i.foto5, i.fotografYolu, i.ozellikler, "
         "       k.kullaniciAdi AS ekleyen, k.email AS ekleyenEmail "
         "FROM Ilan i "
         "LEFT JOIN Kullanici k ON i.kullaniciId = k.kullaniciId "
@@ -159,6 +175,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     int     stok         = query.value("stokAdedi").toInt();
     QString ekleyen      = query.value("ekleyen").toString();
     QString ekleyenEmail = query.value("ekleyenEmail").toString();
+    QString ozellikler   = query.value("ozellikler").toString();
 
     // Fotoğraf listesi: foto1..foto5, yoksa fotografYolu (eski kayıtlar için)
     QStringList fotolar;
@@ -248,6 +265,13 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     QLabel *lblKategori = new QLabel("📂 Kategori: " + kategori);
     lblKategori->setStyleSheet("font-size: 13px; color: #aaaaaa;");
     anaLayout->addWidget(lblKategori);
+
+    if (!ozellikler.isEmpty()) {
+        QLabel *lblOzel = new QLabel("⚙ Özellikler:\n" + ozellikler.replace(" | ", "\n"));
+        lblOzel->setStyleSheet("font-size: 13px; color: #b3e5fc; font-weight: bold; background-color: #2d2d2d; padding: 6px; border-radius: 4px;");
+        lblOzel->setWordWrap(true);
+        anaLayout->addWidget(lblOzel);
+    }
 
     // ── İlanı ekleyenin bilgisi ──
     if (!ekleyen.isEmpty()) {
@@ -356,4 +380,59 @@ void AnaSayfa::on_btnCikisYap_clicked() {
     GirisEkrani *giris = new GirisEkrani();
     giris->show();
     this->close();
+}
+
+void AnaSayfa::on_btnFiltrele_clicked() {
+    QDialog *filtreDialog = new QDialog(this);
+    filtreDialog->setWindowTitle(guncelKategori + " Filtrele");
+    filtreDialog->setMinimumWidth(300);
+    QVBoxLayout *layout = new QVBoxLayout(filtreDialog);
+    
+    QLabel *lblInfo = new QLabel("<b>" + guncelKategori + " İçin Detaylı Filtre</b>");
+    layout->addWidget(lblInfo);
+    
+    QFormLayout *formLayout = new QFormLayout();
+    QLineEdit *txtKelime = new QLineEdit();
+    txtKelime->setPlaceholderText("Örn: 3+1, İkinci El, vb.");
+    formLayout->addRow("Özelliklerde Ara:", txtKelime);
+    
+    QLineEdit *txtMinFiyat = new QLineEdit();
+    QLineEdit *txtMaxFiyat = new QLineEdit();
+    formLayout->addRow("Min Fiyat (TL):", txtMinFiyat);
+    formLayout->addRow("Max Fiyat (TL):", txtMaxFiyat);
+    
+    layout->addLayout(formLayout);
+    
+    QPushButton *btnUygula = new QPushButton("Filtreleri Uygula");
+    btnUygula->setStyleSheet("background-color: #4CAF50; color: white; padding: 8px; font-weight: bold; border-radius: 4px;");
+    layout->addWidget(btnUygula);
+    
+    connect(btnUygula, &QPushButton::clicked, filtreDialog, [=]() {
+        QString kelime = txtKelime->text().trimmed();
+        double minFiyat = txtMinFiyat->text().toDouble();
+        double maxFiyat = txtMaxFiyat->text().toDouble();
+        
+        QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
+        QSqlQuery query(db);
+        
+        QString sql = "SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE kategori = :kat";
+        if (!kelime.isEmpty()) sql += " AND ozellikler LIKE :kelime";
+        if (minFiyat > 0) sql += " AND fiyat >= :minF";
+        if (maxFiyat > 0) sql += " AND fiyat <= :maxF";
+        
+        query.prepare(sql);
+        query.bindValue(":kat", guncelKategori);
+        if (!kelime.isEmpty()) query.bindValue(":kelime", "%" + kelime + "%");
+        if (minFiyat > 0) query.bindValue(":minF", minFiyat);
+        if (maxFiyat > 0) query.bindValue(":maxF", maxFiyat);
+        
+        if (query.exec()) {
+            listeyiDoldur(query);
+            filtreDialog->accept();
+        } else {
+            QMessageBox::warning(this, "Hata", "Filtre uygulanamadı.");
+        }
+    });
+    
+    filtreDialog->exec();
 }

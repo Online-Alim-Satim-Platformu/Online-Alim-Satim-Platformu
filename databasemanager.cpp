@@ -48,6 +48,7 @@ bool DatabaseManager::baglantiKur() {
     query.exec("ALTER TABLE Ilan ADD COLUMN foto3 TEXT");
     query.exec("ALTER TABLE Ilan ADD COLUMN foto4 TEXT");
     query.exec("ALTER TABLE Ilan ADD COLUMN foto5 TEXT");
+    query.exec("ALTER TABLE Ilan ADD COLUMN ozellikler TEXT");
 
     // EĞER KULLANICI TABLOSU BOŞSA, OTOMATİK OLARAK SENİ EKLİYORUZ Kİ PROFİL BOŞ KALMASIN
     QSqlQuery checkQuery(db);
