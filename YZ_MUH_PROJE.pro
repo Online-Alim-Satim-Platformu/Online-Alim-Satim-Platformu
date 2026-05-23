@@ -25,7 +25,8 @@ HEADERS += \
     ilanekle.h \
     kayitekrani.h \
     profil.h \
-    session.h
+    session.h \
+    sifremiunuttum.h
 
 FORMS += \
     anasayfa.ui \
