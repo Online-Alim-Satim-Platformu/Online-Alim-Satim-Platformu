@@ -15,11 +15,11 @@ public:
     explicit SifremiUnuttum(QWidget *parent = nullptr);
     ~SifremiUnuttum();
 
+private slots:
+    void on_btnSifreGuncelle_clicked();
+
 private:
     Ui::SifremiUnuttum *ui;
 };
 
 #endif // SIFREMIUNUTTUM_H
-// private slots: altına şunu ekle
-private slots:
-void on_btnSifreGuncelle_clicked();
