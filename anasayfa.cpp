@@ -51,6 +51,8 @@ void AnaSayfa::listeyiDoldur(QSqlQuery &query) {
     ui->listVitrin->setResizeMode(QListView::Adjust);
     ui->listVitrin->setSpacing(20);
     ui->listVitrin->setWordWrap(true);
+    ui->listVitrin->setMovement(QListView::Static);
+    ui->listVitrin->setDragDropMode(QAbstractItemView::NoDragDrop);
 
     while (query.next()) {
         int     ilanNo   = query.value("ilanNo").toInt();
@@ -200,6 +202,10 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         btnIleri->setStyleSheet("QPushButton{background:#333;color:white;border-radius:4px;font-weight:bold;}"
                                 "QPushButton:hover{background:#555;}");
 
+        QLabel *lblSayac = new QLabel();
+        lblSayac->setAlignment(Qt::AlignCenter);
+        lblSayac->setStyleSheet("color: #aaaaaa; font-size: 11px;");
+
         auto guncelleFoto = [=]() {
             QPixmap px(fotolar[*sliderIndex]);
             if (!px.isNull())
@@ -208,6 +214,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
                 lblFotoSlider->setText("Görsel yüklenemedi");
             btnGeri->setEnabled(*sliderIndex > 0);
             btnIleri->setEnabled(*sliderIndex < fotolar.size() - 1);
+            lblSayac->setText(QString("%1 / %2").arg(*sliderIndex + 1).arg(fotolar.size()));
         };
 
         connect(btnGeri,  &QPushButton::clicked, detay, [=]() { --(*sliderIndex); guncelleFoto(); });
@@ -220,6 +227,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
         sliderLayout->addWidget(lblFotoSlider, 1);
         sliderLayout->addWidget(btnIleri);
         anaLayout->addLayout(sliderLayout);
+        anaLayout->addWidget(lblSayac);
 
         guncelleFoto();
     }
@@ -270,6 +278,46 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     scroll->setMinimumHeight(80);
     scroll->setStyleSheet("border: none; background-color: #2d2d2d;");
     anaLayout->addWidget(scroll);
+
+    if (aktifKullaniciId > 0) {
+        QSqlQuery favKontrol(db);
+        favKontrol.prepare("SELECT 1 FROM Favoriler WHERE kullaniciId = :uid AND ilanNo = :ilan");
+        favKontrol.bindValue(":uid",  aktifKullaniciId);
+        favKontrol.bindValue(":ilan", ilanNo);
+        bool zatenFav = favKontrol.exec() && favKontrol.next();
+
+        QPushButton *btnFavori = new QPushButton(zatenFav ? "★ Favorilerden Çıkar" : "☆ Favoriye Ekle");
+        btnFavori->setStyleSheet(
+            "QPushButton { background-color: #f59e0b; color: white; border-radius: 6px; "
+            "padding: 8px; font-weight: bold; }"
+            "QPushButton:hover { background-color: #d97706; }");
+
+        connect(btnFavori, &QPushButton::clicked, detay, [=]() {
+            QSqlDatabase db2 = DatabaseManager::getInstance()->getDatabase();
+            QSqlQuery kontrol(db2);
+            kontrol.prepare("SELECT 1 FROM Favoriler WHERE kullaniciId = :uid AND ilanNo = :ilan");
+            kontrol.bindValue(":uid",  aktifKullaniciId);
+            kontrol.bindValue(":ilan", ilanNo);
+
+            if (kontrol.exec() && kontrol.next()) {
+                QSqlQuery sil(db2);
+                sil.prepare("DELETE FROM Favoriler WHERE kullaniciId = :uid AND ilanNo = :ilan");
+                sil.bindValue(":uid",  aktifKullaniciId);
+                sil.bindValue(":ilan", ilanNo);
+                sil.exec();
+                btnFavori->setText("☆ Favoriye Ekle");
+            } else {
+                QSqlQuery ekle(db2);
+                ekle.prepare("INSERT OR IGNORE INTO Favoriler (kullaniciId, ilanNo) VALUES (:uid, :ilan)");
+                ekle.bindValue(":uid",  aktifKullaniciId);
+                ekle.bindValue(":ilan", ilanNo);
+                ekle.exec();
+                btnFavori->setText("★ Favorilerden Çıkar");
+            }
+        });
+
+        anaLayout->addWidget(btnFavori);
+    }
 
     QPushButton *btnKapat = new QPushButton("✖ Kapat");
     btnKapat->setStyleSheet("QPushButton { background-color: #555555; color: white; "

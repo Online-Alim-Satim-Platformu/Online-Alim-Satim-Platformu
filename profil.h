@@ -18,12 +18,15 @@ public:
 
 private slots:
     void on_btnIlanSil_clicked();
-    void on_btnIlanDuzenle_clicked();   // YENİ: düzenleme popup'ı
+    void on_btnIlanDuzenle_clicked();
     void on_btnGeri_clicked();
     void on_btnSifreDegistir_clicked();
+    void on_btnFavorilerim_clicked();
+    void on_btnFavoridenCikar_clicked();
 
 private:
     Ui::Profil *ui;
+    void favoriIlanlariniYukle();
 };
 
 #endif // PROFIL_H

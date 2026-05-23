@@ -37,6 +37,10 @@ bool DatabaseManager::baglantiKur() {
                "foto1 TEXT, foto2 TEXT, foto3 TEXT, foto4 TEXT, foto5 TEXT, "
                "kullaniciId INTEGER)");
 
+    query.exec("CREATE TABLE IF NOT EXISTS Favoriler ("
+               "kullaniciId INTEGER, ilanNo INTEGER, "
+               "PRIMARY KEY(kullaniciId, ilanNo))");
+
     // migration — mevcut tablolara yeni kolonlar ekle (hata olursa yok sayılır)
     query.exec("ALTER TABLE Ilan ADD COLUMN kullaniciId INTEGER");
     query.exec("ALTER TABLE Ilan ADD COLUMN foto1 TEXT");

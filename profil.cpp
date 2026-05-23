@@ -83,7 +83,7 @@ void Profil::profilIlanlariniYukle() {
 
     QSqlQuery query(db);
     query.prepare(
-        "SELECT ilanNo, baslik, fiyat "
+        "SELECT ilanNo, baslik, fiyat, kategori "
         "FROM Ilan "
         "WHERE kullaniciId = :uid "
         "ORDER BY ilanNo DESC");
@@ -95,11 +95,12 @@ void Profil::profilIlanlariniYukle() {
     }
 
     while (query.next()) {
-        int     ilanNo = query.value("ilanNo").toInt();
-        QString baslik = query.value("baslik").toString();
-        QString fiyat  = query.value("fiyat").toString();
+        int     ilanNo   = query.value("ilanNo").toInt();
+        QString baslik   = query.value("baslik").toString();
+        QString fiyat    = query.value("fiyat").toString();
+        QString kategori = query.value("kategori").toString();
 
-        QString metin = baslik + "  —  " + fiyat + " TL\n✏  Sizin ilanınız";
+        QString metin = baslik + "  —  " + fiyat + " TL\n✏  Kategori: " + kategori;
 
         QListWidgetItem *item = new QListWidgetItem(metin);
         item->setData(Qt::UserRole,     ilanNo);
@@ -197,12 +198,35 @@ void Profil::on_btnIlanDuzenle_clicked()
     anaLayout->addWidget(txtAciklama);
 
     anaLayout->addWidget(new QLabel("Stok Adedi:"));
+    QHBoxLayout *stokLayout = new QHBoxLayout();
+    QPushButton *btnStokAzalt = new QPushButton("-");
+    btnStokAzalt->setFixedSize(36, 36);
+    btnStokAzalt->setStyleSheet(
+        "QPushButton { background-color: #ef4444; color: white; font-size: 16px; font-weight: bold; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #dc2626; }");
     QSpinBox *spinStok = new QSpinBox();
     spinStok->setRange(0, 9999);
     spinStok->setValue(mevcutStok);
+    spinStok->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    spinStok->setAlignment(Qt::AlignCenter);
     spinStok->setStyleSheet(
-        "QSpinBox { background-color: white; color: #000000; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px; }");
-    anaLayout->addWidget(spinStok);
+        "QSpinBox { background-color: white; color: #000000; border: 1px solid #d1d5db; "
+        "border-radius: 6px; padding: 4px; font-size: 13px; font-weight: bold; }");
+    QPushButton *btnStokArttir = new QPushButton("+");
+    btnStokArttir->setFixedSize(36, 36);
+    btnStokArttir->setStyleSheet(
+        "QPushButton { background-color: #22c55e; color: white; font-size: 16px; font-weight: bold; border-radius: 6px; }"
+        "QPushButton:hover { background-color: #16a34a; }");
+    connect(btnStokAzalt, &QPushButton::clicked, dialog, [spinStok]() {
+        if (spinStok->value() > 0) spinStok->setValue(spinStok->value() - 1);
+    });
+    connect(btnStokArttir, &QPushButton::clicked, dialog, [spinStok]() {
+        spinStok->setValue(spinStok->value() + 1);
+    });
+    stokLayout->addWidget(btnStokAzalt);
+    stokLayout->addWidget(spinStok, 1);
+    stokLayout->addWidget(btnStokArttir);
+    anaLayout->addLayout(stokLayout);
 
     // 5 fotoğraf satırı
     anaLayout->addWidget(new QLabel("Fotoğraflar:"));
@@ -449,6 +473,80 @@ void Profil::on_btnSifreDegistir_clicked() {
     });
 
     dialog->exec();
+}
+
+void Profil::favoriIlanlariniYukle() {
+    ui->listFavoriler->clear();
+
+    QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
+    if (!db.isOpen()) db.open();
+
+    QSqlQuery query(db);
+    query.prepare(
+        "SELECT i.ilanNo, i.baslik, i.fiyat, i.kategori "
+        "FROM Favoriler f "
+        "JOIN Ilan i ON f.ilanNo = i.ilanNo "
+        "WHERE f.kullaniciId = :uid "
+        "ORDER BY i.ilanNo DESC");
+    query.bindValue(":uid", aktifKullaniciId);
+
+    if (!query.exec()) {
+        qDebug() << "Favori yükleme hatası:" << query.lastError().text();
+        return;
+    }
+
+    while (query.next()) {
+        int     ilanNo   = query.value("ilanNo").toInt();
+        QString baslik   = query.value("baslik").toString();
+        QString fiyat    = query.value("fiyat").toString();
+        QString kategori = query.value("kategori").toString();
+
+        QString metin = baslik + "  —  " + fiyat + " TL\n★  Kategori: " + kategori;
+
+        QListWidgetItem *item = new QListWidgetItem(metin);
+        item->setData(Qt::UserRole, ilanNo);
+        item->setForeground(QBrush(QColor("#d97706")));
+        ui->listFavoriler->addItem(item);
+    }
+}
+
+void Profil::on_btnFavorilerim_clicked() {
+    bool favGoster = !ui->listFavoriler->isVisible();
+
+    ui->listFavoriler->setVisible(favGoster);
+    ui->listProfilIlanlar->setVisible(!favGoster);
+    ui->btnIlanDuzenle->setVisible(!favGoster);
+    ui->btnIlanSil->setVisible(!favGoster);
+    ui->btnFavoridenCikar->setVisible(favGoster);
+    ui->lblIlanBaslik->setText(favGoster ? "Favorilerim" : "İlanlarım");
+    ui->btnFavorilerim->setText(favGoster ? "← İlanlarıma Dön" : "★ Favorilerim");
+
+    if (favGoster)
+        favoriIlanlariniYukle();
+}
+
+void Profil::on_btnFavoridenCikar_clicked() {
+    QListWidgetItem *secili = ui->listFavoriler->currentItem();
+    if (!secili) {
+        mesajGoster(this, QMessageBox::Warning, "Uyarı",
+                    "Lütfen önce çıkarmak istediğiniz ilanı seçin!");
+        return;
+    }
+
+    int ilanNo = secili->data(Qt::UserRole).toInt();
+
+    QSqlQuery query(DatabaseManager::getInstance()->getDatabase());
+    query.prepare("DELETE FROM Favoriler WHERE kullaniciId = :uid AND ilanNo = :ilan");
+    query.bindValue(":uid",  aktifKullaniciId);
+    query.bindValue(":ilan", ilanNo);
+
+    if (query.exec()) {
+        mesajGoster(this, QMessageBox::Information, "Başarılı", "İlan favorilerden çıkarıldı.");
+        favoriIlanlariniYukle();
+    } else {
+        mesajGoster(this, QMessageBox::Critical, "Hata",
+                    "İşlem başarısız!\n" + query.lastError().text());
+    }
 }
 
 void Profil::on_btnGeri_clicked() {
