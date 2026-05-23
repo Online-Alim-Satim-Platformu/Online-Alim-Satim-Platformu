@@ -140,16 +140,22 @@ void IlanEkle::on_btnIptal_clicked() {
 void IlanEkle::ozellikleriTemizle() {
     QLayoutItem *child;
     while ((child = ui->layoutOzellikler->takeAt(0)) != nullptr) {
-        if (child->widget()) delete child->widget();
-        else if (child->layout()) {
+        if (child->widget()) {
+            delete child->widget();
+            delete child;
+        } else if (child->layout()) {
+            QLayout *subLayout = child->layout();
             QLayoutItem *subchild;
-            while ((subchild = child->layout()->takeAt(0)) != nullptr) {
-                if (subchild->widget()) delete subchild->widget();
+            while ((subchild = subLayout->takeAt(0)) != nullptr) {
+                if (subchild->widget()) {
+                    delete subchild->widget();
+                }
                 delete subchild;
             }
-            delete child->layout();
+            delete subLayout;
+        } else {
+            delete child;
         }
-        delete child;
     }
     ozellikAlanlari.clear();
 }
@@ -175,7 +181,7 @@ void IlanEkle::on_cmbKategori_currentTextChanged(const QString &kategori) {
     if (kategori == "Emlak") {
         ozellikEkle("Bina Yaşı");
         ozellikEkle("Metrekare");
-        ozellikEkle("Oda Sayısı (Örn: 3+1)");
+        ozellikEkle("Oda Sayısı");
         ozellikEkle("Bulunduğu Kat");
     } else if (kategori == "Vasıta") {
         ozellikEkle("Marka");

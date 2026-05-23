@@ -20,6 +20,7 @@
 #include <QScrollArea>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QMap>
 
 AnaSayfa::AnaSayfa(QWidget *parent) : QWidget(parent), ui(new Ui::AnaSayfa) {
     ui->setupUi(this);
@@ -385,54 +386,145 @@ void AnaSayfa::on_btnCikisYap_clicked() {
 void AnaSayfa::on_btnFiltrele_clicked() {
     QDialog *filtreDialog = new QDialog(this);
     filtreDialog->setWindowTitle(guncelKategori + " Filtrele");
-    filtreDialog->setMinimumWidth(300);
+    filtreDialog->setMinimumWidth(380);
+    filtreDialog->setStyleSheet("background-color: #1e1e1e; color: white; font-family: 'Segoe UI', Arial, sans-serif;");
+
     QVBoxLayout *layout = new QVBoxLayout(filtreDialog);
-    
-    QLabel *lblInfo = new QLabel("<b>" + guncelKategori + " İçin Detaylı Filtre</b>");
+    layout->setSpacing(15);
+    layout->setContentsMargins(20, 20, 20, 20);
+
+    QLabel *lblInfo = new QLabel("<b>" + guncelKategori + " İçin Detaylı Filtre</b>", filtreDialog);
+    lblInfo->setStyleSheet("font-size: 16px; color: #4CAF50; margin-bottom: 5px;");
     layout->addWidget(lblInfo);
-    
+
     QFormLayout *formLayout = new QFormLayout();
-    QLineEdit *txtKelime = new QLineEdit();
-    txtKelime->setPlaceholderText("Örn: 3+1, İkinci El, vb.");
-    formLayout->addRow("Özelliklerde Ara:", txtKelime);
-    
-    QLineEdit *txtMinFiyat = new QLineEdit();
-    QLineEdit *txtMaxFiyat = new QLineEdit();
-    formLayout->addRow("Min Fiyat (TL):", txtMinFiyat);
-    formLayout->addRow("Max Fiyat (TL):", txtMaxFiyat);
-    
+    formLayout->setSpacing(10);
+
+    QString editStyle = "QLineEdit { background-color: #2d2d2d; color: white; border: 1px solid #444; border-radius: 4px; padding: 6px; }"
+                        "QLineEdit:focus { border: 1px solid #4CAF50; }";
+
+    // Kategoriye özel özellikleri belirle
+    QStringList ozellikler;
+    if (guncelKategori == "Emlak") {
+        ozellikler << "Bina Yaşı" << "Metrekare" << "Oda Sayısı" << "Bulunduğu Kat";
+    } else if (guncelKategori == "Vasıta") {
+        ozellikler << "Marka" << "Model" << "Yıl" << "Kilometre";
+    } else if (guncelKategori == "Elektronik") {
+        ozellikler << "Marka" << "Durum (Sıfır/İkinci El)" << "Garanti (Var/Yok)";
+    } else if (guncelKategori == "Giyim") {
+        ozellikler << "Beden" << "Renk" << "Durum";
+    }
+
+    // Özellik editlerini oluştur ve ekle
+    QMap<QString, QLineEdit*> ozellikEditleri;
+    for (const QString &ozellik : ozellikler) {
+        QLineEdit *edit = new QLineEdit(filtreDialog);
+        edit->setStyleSheet(editStyle);
+        edit->setPlaceholderText(ozellik + " girin...");
+        
+        QLabel *lblField = new QLabel(ozellik + ":", filtreDialog);
+        lblField->setStyleSheet("font-weight: bold; color: #ccc;");
+        
+        formLayout->addRow(lblField, edit);
+        ozellikEditleri[ozellik] = edit;
+    }
+
+    // Genel "Özelliklerde Ara" alanı
+    QLineEdit *txtKelime = new QLineEdit(filtreDialog);
+    txtKelime->setStyleSheet(editStyle);
+    txtKelime->setPlaceholderText("Örn: 3+1, İkinci El, Mavi vb.");
+    QLabel *lblKelime = new QLabel("Özellik/Açıklamada Ara:", filtreDialog);
+    lblKelime->setStyleSheet("font-weight: bold; color: #ccc;");
+    formLayout->addRow(lblKelime, txtKelime);
+
+    // Fiyat filtreleri
+    QLineEdit *txtMinFiyat = new QLineEdit(filtreDialog);
+    txtMinFiyat->setStyleSheet(editStyle);
+    txtMinFiyat->setPlaceholderText("Minimum fiyat...");
+    QLabel *lblMinF = new QLabel("Min Fiyat (TL):", filtreDialog);
+    lblMinF->setStyleSheet("font-weight: bold; color: #ccc;");
+    formLayout->addRow(lblMinF, txtMinFiyat);
+
+    QLineEdit *txtMaxFiyat = new QLineEdit(filtreDialog);
+    txtMaxFiyat->setStyleSheet(editStyle);
+    txtMaxFiyat->setPlaceholderText("Maksimum fiyat...");
+    QLabel *lblMaxF = new QLabel("Max Fiyat (TL):", filtreDialog);
+    lblMaxF->setStyleSheet("font-weight: bold; color: #ccc;");
+    formLayout->addRow(lblMaxF, txtMaxFiyat);
+
     layout->addLayout(formLayout);
-    
-    QPushButton *btnUygula = new QPushButton("Filtreleri Uygula");
-    btnUygula->setStyleSheet("background-color: #4CAF50; color: white; padding: 8px; font-weight: bold; border-radius: 4px;");
-    layout->addWidget(btnUygula);
-    
+
+    // Buton satırı
+    QHBoxLayout *btnLayout = new QHBoxLayout();
+    btnLayout->setSpacing(10);
+
+    QPushButton *btnUygula = new QPushButton("Filtreleri Uygula", filtreDialog);
+    btnUygula->setStyleSheet(
+        "QPushButton { background-color: #4CAF50; color: white; padding: 10px; font-weight: bold; border-radius: 6px; font-size: 13px; border: none; }"
+        "QPushButton:hover { background-color: #45a049; }"
+        "QPushButton:pressed { background-color: #3e8e41; }"
+    );
+
+    QPushButton *btnIptal = new QPushButton("İptal", filtreDialog);
+    btnIptal->setStyleSheet(
+        "QPushButton { background-color: #444; color: white; padding: 10px; font-weight: bold; border-radius: 6px; font-size: 13px; border: none; }"
+        "QPushButton:hover { background-color: #555; }"
+        "QPushButton:pressed { background-color: #333; }"
+    );
+
+    btnLayout->addWidget(btnIptal);
+    btnLayout->addWidget(btnUygula);
+    layout->addLayout(btnLayout);
+
     connect(btnUygula, &QPushButton::clicked, filtreDialog, [=]() {
         QString kelime = txtKelime->text().trimmed();
         double minFiyat = txtMinFiyat->text().toDouble();
         double maxFiyat = txtMaxFiyat->text().toDouble();
-        
+
         QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
         QSqlQuery query(db);
-        
+
         QString sql = "SELECT ilanNo, baslik, fiyat, COALESCE(foto1, fotografYolu) AS fotografYolu FROM Ilan WHERE kategori = :kat";
-        if (!kelime.isEmpty()) sql += " AND ozellikler LIKE :kelime";
+        
+        if (!kelime.isEmpty()) {
+            sql += " AND (ozellikler LIKE :kelime OR aciklama LIKE :kelime)";
+        }
+
         if (minFiyat > 0) sql += " AND fiyat >= :minF";
         if (maxFiyat > 0) sql += " AND fiyat <= :maxF";
-        
+
+        // Kategori özelliklerini filtreye ekle
+        int paramIndex = 0;
+        QMap<QString, QString> filtreDegerleri;
+        for (auto it = ozellikEditleri.begin(); it != ozellikEditleri.end(); ++it) {
+            QString val = it.value()->text().trimmed();
+            if (!val.isEmpty()) {
+                QString paramName = QString(":param_%1").arg(paramIndex++);
+                sql += QString(" AND ozellikler LIKE %1").arg(paramName);
+                filtreDegerleri[paramName] = "%" + it.key() + ": " + val + "%";
+            }
+        }
+
         query.prepare(sql);
         query.bindValue(":kat", guncelKategori);
         if (!kelime.isEmpty()) query.bindValue(":kelime", "%" + kelime + "%");
         if (minFiyat > 0) query.bindValue(":minF", minFiyat);
         if (maxFiyat > 0) query.bindValue(":maxF", maxFiyat);
-        
+
+        // Dinamik parametreleri bağla
+        for (auto it = filtreDegerleri.begin(); it != filtreDegerleri.end(); ++it) {
+            query.bindValue(it.key(), it.value());
+        }
+
         if (query.exec()) {
             listeyiDoldur(query);
             filtreDialog->accept();
         } else {
-            QMessageBox::warning(this, "Hata", "Filtre uygulanamadı.");
+            QMessageBox::warning(this, "Hata", "Filtre uygulanamadı: " + query.lastError().text());
         }
     });
-    
+
+    connect(btnIptal, &QPushButton::clicked, filtreDialog, &QDialog::reject);
+
     filtreDialog->exec();
 }
