@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QListWidgetItem>
 #include <QSqlQuery>
-
+#include <QPushButton>
 namespace Ui { class AnaSayfa; }
 
 class AnaSayfa : public QWidget {

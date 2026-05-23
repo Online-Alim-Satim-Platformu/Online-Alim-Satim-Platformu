@@ -1,0 +1,15 @@
+debug/anasayfa.o
+debug/databasemanager.o
+debug/girisekrani.o
+debug/ilanekle.o
+debug/kayitekrani.o
+debug/sifremiunuttum.o
+debug/main.o
+debug/profil.o
+debug/session.o
+debug/moc_anasayfa.o
+debug/moc_girisekrani.o
+debug/moc_ilanekle.o
+debug/moc_kayitekrani.o
+debug/moc_profil.o
+debug/moc_sifremiunuttum.o

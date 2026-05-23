@@ -14,6 +14,7 @@ SOURCES += \
     girisekrani.cpp \
     ilanekle.cpp \
     kayitekrani.cpp \
+    sifremiunuttum.cpp \
     main.cpp \
     profil.cpp \
     session.cpp
@@ -32,6 +33,7 @@ FORMS += \
     anasayfa.ui \
     girisekrani.ui \
     ilanekle.ui \
+    sifremiunuttum.ui \
     kayitekrani.ui \
     profil.ui
 
