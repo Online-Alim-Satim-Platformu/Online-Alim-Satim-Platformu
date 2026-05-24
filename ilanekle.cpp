@@ -183,19 +183,33 @@ void IlanEkle::on_cmbKategori_currentTextChanged(const QString &kategori) {
         ozellikEkle("Metrekare");
         ozellikEkle("Oda Sayısı");
         ozellikEkle("Bulunduğu Kat");
+        ozellikEkle("Konum (İl/İlçe)");
+        ozellikEkle("Isıtma Tipi");
+        ozellikEkle("Balkon (Var/Yok)");
     } else if (kategori == "Vasıta") {
         ozellikEkle("Marka");
         ozellikEkle("Model");
         ozellikEkle("Yıl");
         ozellikEkle("Kilometre");
+        ozellikEkle("Yakıt Tipi");
+        ozellikEkle("Vites Tipi");
+        ozellikEkle("Hasar Kaydı (TL)");
     } else if (kategori == "Elektronik") {
         ozellikEkle("Marka");
+        ozellikEkle("Model");
+        ozellikEkle("Renk");
         ozellikEkle("Durum (Sıfır/İkinci El)");
         ozellikEkle("Garanti (Var/Yok)");
+        ozellikEkle("Fatura (Var/Yok)");
+        ozellikEkle("Kutu (Var/Yok)");
     } else if (kategori == "Giyim") {
+        ozellikEkle("Marka");
         ozellikEkle("Beden");
         ozellikEkle("Renk");
         ozellikEkle("Durum");
+        ozellikEkle("Kumaş Tipi");
+        ozellikEkle("Cinsiyet");
+        ozellikEkle("Kullanım Türü");
     }
     ui->layoutOzellikler->addStretch();
 }

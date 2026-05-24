@@ -192,13 +192,35 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
 
     QDialog *detay = new QDialog(this);
     detay->setWindowTitle("İlan Detayı");
-    detay->setMinimumSize(500, 480);
+    detay->setMinimumSize(500, 550);
+    detay->resize(520, 620);
     detay->setStyleSheet("background-color: #1e1e1e; color: white;");
     detay->setAttribute(Qt::WA_DeleteOnClose);
 
-    QVBoxLayout *anaLayout = new QVBoxLayout(detay);
+    // Dialog layout holding the scroll area and the pinned bottom action bar
+    QVBoxLayout *dialogLayout = new QVBoxLayout(detay);
+    dialogLayout->setContentsMargins(0, 0, 0, 0);
+    dialogLayout->setSpacing(0);
+
+    QScrollArea *mainScroll = new QScrollArea(detay);
+    mainScroll->setWidgetResizable(true);
+    mainScroll->setStyleSheet("QScrollArea { border: none; background-color: #1e1e1e; }");
+
+    QWidget *scrollContent = new QWidget();
+    scrollContent->setStyleSheet("background-color: #1e1e1e;");
+    QVBoxLayout *anaLayout = new QVBoxLayout(scrollContent);
     anaLayout->setSpacing(12);
-    anaLayout->setContentsMargins(20, 20, 20, 20);
+    anaLayout->setContentsMargins(20, 20, 20, 10);
+    mainScroll->setWidget(scrollContent);
+    dialogLayout->addWidget(mainScroll, 1);
+
+    // Pinned bottom bar for buttons
+    QWidget *bottomBar = new QWidget(detay);
+    bottomBar->setStyleSheet("background-color: #1e1e1e; border-top: 1px solid #2d2d2d;");
+    QVBoxLayout *bottomLayout = new QVBoxLayout(bottomBar);
+    bottomLayout->setSpacing(8);
+    bottomLayout->setContentsMargins(20, 12, 20, 15);
+    dialogLayout->addWidget(bottomBar);
 
     // ── Fotoğraf Slider ──
     if (!fotolar.isEmpty()) {
@@ -292,17 +314,11 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
     anaLayout->addWidget(lblAciklamaBaslik);
 
     QLabel *lblAciklama = new QLabel(aciklama.isEmpty() ? "Açıklama girilmemiş." : aciklama);
-    lblAciklama->setStyleSheet("font-size: 13px; color: white; padding: 8px; "
+    lblAciklama->setStyleSheet("font-size: 13px; color: white; padding: 12px; "
                                "background-color: #2d2d2d; border-radius: 6px;");
     lblAciklama->setWordWrap(true);
     lblAciklama->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-    QScrollArea *scroll = new QScrollArea();
-    scroll->setWidget(lblAciklama);
-    scroll->setWidgetResizable(true);
-    scroll->setMinimumHeight(80);
-    scroll->setStyleSheet("border: none; background-color: #2d2d2d;");
-    anaLayout->addWidget(scroll);
+    anaLayout->addWidget(lblAciklama);
 
     if (aktifKullaniciId > 0) {
         QSqlQuery favKontrol(db);
@@ -341,7 +357,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
             }
         });
 
-        anaLayout->addWidget(btnFavori);
+        bottomLayout->addWidget(btnFavori);
     }
 
     QPushButton *btnKapat = new QPushButton("✖ Kapat");
@@ -349,7 +365,7 @@ void AnaSayfa::on_listVitrin_itemDoubleClicked(QListWidgetItem *item) {
                             "border-radius: 6px; padding: 8px; font-weight: bold; }"
                             "QPushButton:hover { background-color: #777777; }");
     connect(btnKapat, &QPushButton::clicked, detay, &QDialog::close);
-    anaLayout->addWidget(btnKapat);
+    bottomLayout->addWidget(btnKapat);
 
     detay->exec();
 }
@@ -406,13 +422,13 @@ void AnaSayfa::on_btnFiltrele_clicked() {
     // Kategoriye özel özellikleri belirle
     QStringList ozellikler;
     if (guncelKategori == "Emlak") {
-        ozellikler << "Bina Yaşı" << "Metrekare" << "Oda Sayısı" << "Bulunduğu Kat";
+        ozellikler << "Bina Yaşı" << "Metrekare" << "Oda Sayısı" << "Bulunduğu Kat" << "Konum (İl/İlçe)" << "Isıtma Tipi" << "Balkon (Var/Yok)";
     } else if (guncelKategori == "Vasıta") {
-        ozellikler << "Marka" << "Model" << "Yıl" << "Kilometre";
+        ozellikler << "Marka" << "Model" << "Yıl" << "Kilometre" << "Yakıt Tipi" << "Vites Tipi" << "Hasar Kaydı (TL)";
     } else if (guncelKategori == "Elektronik") {
-        ozellikler << "Marka" << "Durum (Sıfır/İkinci El)" << "Garanti (Var/Yok)";
+        ozellikler << "Marka" << "Model" << "Renk" << "Durum (Sıfır/İkinci El)" << "Garanti (Var/Yok)" << "Fatura (Var/Yok)" << "Kutu (Var/Yok)";
     } else if (guncelKategori == "Giyim") {
-        ozellikler << "Beden" << "Renk" << "Durum";
+        ozellikler << "Marka" << "Beden" << "Renk" << "Durum" << "Kumaş Tipi" << "Cinsiyet" << "Kullanım Türü";
     }
 
     // Özellik editlerini oluştur ve ekle

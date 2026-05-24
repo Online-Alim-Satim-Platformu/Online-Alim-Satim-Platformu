@@ -24,6 +24,8 @@ class Ui_SifremiUnuttum
 public:
     QVBoxLayout *verticalLayout;
     QLabel *label;
+    QLabel *labelKullaniciAdi;
+    QLineEdit *txtKullaniciAdi;
     QLabel *label_2;
     QLineEdit *txtEmail;
     QLabel *label_3;
@@ -34,7 +36,7 @@ public:
     {
         if (SifremiUnuttum->objectName().isEmpty())
             SifremiUnuttum->setObjectName("SifremiUnuttum");
-        SifremiUnuttum->resize(350, 250);
+        SifremiUnuttum->resize(350, 320);
         verticalLayout = new QVBoxLayout(SifremiUnuttum);
         verticalLayout->setObjectName("verticalLayout");
         label = new QLabel(SifremiUnuttum);
@@ -46,6 +48,17 @@ public:
         label->setAlignment(Qt::AlignCenter);
 
         verticalLayout->addWidget(label);
+
+        labelKullaniciAdi = new QLabel(SifremiUnuttum);
+        labelKullaniciAdi->setObjectName("labelKullaniciAdi");
+
+        verticalLayout->addWidget(labelKullaniciAdi);
+
+        txtKullaniciAdi = new QLineEdit(SifremiUnuttum);
+        txtKullaniciAdi->setObjectName("txtKullaniciAdi");
+        txtKullaniciAdi->setMinimumSize(QSize(0, 30));
+
+        verticalLayout->addWidget(txtKullaniciAdi);
 
         label_2 = new QLabel(SifremiUnuttum);
         label_2->setObjectName("label_2");
@@ -87,6 +100,7 @@ public:
     {
         SifremiUnuttum->setWindowTitle(QCoreApplication::translate("SifremiUnuttum", "\305\236ifre Yenileme", nullptr));
         label->setText(QCoreApplication::translate("SifremiUnuttum", "\305\236ifremi Unuttum", nullptr));
+        labelKullaniciAdi->setText(QCoreApplication::translate("SifremiUnuttum", "Kullan\304\261c\304\261 Ad\304\261n\304\261z:", nullptr));
         label_2->setText(QCoreApplication::translate("SifremiUnuttum", "E-posta Adresiniz:", nullptr));
         label_3->setText(QCoreApplication::translate("SifremiUnuttum", "Yeni \305\236ifre:", nullptr));
         btnSifreGuncelle->setStyleSheet(QCoreApplication::translate("SifremiUnuttum", "background-color: #0078D7; color: white; font-weight: bold; border-radius: 4px;", nullptr));

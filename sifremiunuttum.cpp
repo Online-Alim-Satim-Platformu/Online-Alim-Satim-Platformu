@@ -17,24 +17,27 @@ SifremiUnuttum::~SifremiUnuttum()
 
 void SifremiUnuttum::on_btnSifreGuncelle_clicked()
 {
-    QString email = ui->txtEmail->text();
-    QString yeniSifre = ui->txtYeniSifre->text();
+    QString kullaniciAdi = ui->txtKullaniciAdi->text().trimmed();
+    QString email = ui->txtEmail->text().trimmed();
+    QString yeniSifre = ui->txtYeniSifre->text().trimmed();
 
-    if (email.isEmpty() || yeniSifre.isEmpty()) {
+    if (kullaniciAdi.isEmpty() || email.isEmpty() || yeniSifre.isEmpty()) {
         QMessageBox::warning(this, "Uyarı", "Lütfen boş alan bırakmayınız.");
         return;
     }
 
-    // 1. Önce böyle bir e-posta veritabanında var mı diye bakıyoruz
+    // 1. Önce kullanıcı adı ve e-posta veritabanında eşleşiyor mu diye bakıyoruz
     QSqlQuery checkQuery;
-    checkQuery.prepare("SELECT * FROM Kullanici WHERE email = :email");
+    checkQuery.prepare("SELECT * FROM Kullanici WHERE kullaniciAdi = :kullaniciAdi AND email = :email");
+    checkQuery.bindValue(":kullaniciAdi", kullaniciAdi);
     checkQuery.bindValue(":email", email);
 
     if (checkQuery.exec() && checkQuery.next()) {
-        // 2. E-posta bulundu! Şifreyi güncelliyoruz (UPDATE sorgusu)
+        // 2. Eşleşme bulundu! Şifreyi güncelliyoruz (UPDATE sorgusu)
         QSqlQuery updateQuery;
-        updateQuery.prepare("UPDATE Kullanici SET sifre = :sifre WHERE email = :email");
+        updateQuery.prepare("UPDATE Kullanici SET sifre = :sifre WHERE kullaniciAdi = :kullaniciAdi AND email = :email");
         updateQuery.bindValue(":sifre", yeniSifre);
+        updateQuery.bindValue(":kullaniciAdi", kullaniciAdi);
         updateQuery.bindValue(":email", email);
 
         if (updateQuery.exec()) {
@@ -44,6 +47,6 @@ void SifremiUnuttum::on_btnSifreGuncelle_clicked()
             QMessageBox::critical(this, "Hata", "Şifre güncellenirken sistemsel bir hata oluştu.");
         }
     } else {
-        QMessageBox::warning(this, "Hata", "Bu e-posta adresine ait bir hesap bulunamadı!");
+        QMessageBox::warning(this, "Hata", "Girilen bilgilere ait bir kullanıcı bulunamadı!");
     }
 }

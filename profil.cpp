@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QSpinBox>
+#include <QScrollArea>
 #include <QSizePolicy>
 #include <QBrush>
 #include <QColor>
@@ -137,7 +138,7 @@ void Profil::on_btnIlanDuzenle_clicked()
     QSqlDatabase db = DatabaseManager::getInstance()->getDatabase();
     QSqlQuery query(db);
     query.prepare("SELECT baslik, fiyat, kategori, aciklama, stokAdedi, "
-                  "foto1, foto2, foto3, foto4, foto5 "
+                  "foto1, foto2, foto3, foto4, foto5, ozellikler "
                   "FROM Ilan WHERE ilanNo = :id");
     query.bindValue(":id", ilanNo);
 
@@ -151,15 +152,30 @@ void Profil::on_btnIlanDuzenle_clicked()
     QString mevcutKategori = query.value("kategori").toString();
     QString mevcutAciklama = query.value("aciklama").toString();
     int     mevcutStok     = query.value("stokAdedi").toInt();
+    QString mevcutOzellikler = query.value("ozellikler").toString();
     QString secilenFotolar[5];
     const QString fotoKolonlar[5] = {"foto1","foto2","foto3","foto4","foto5"};
     for (int i = 0; i < 5; i++)
         secilenFotolar[i] = query.value(fotoKolonlar[i]).toString();
 
+    QMap<QString, QString> ozellikHaritasi;
+    if (!mevcutOzellikler.isEmpty()) {
+        QStringList parcalar = mevcutOzellikler.split(" | ");
+        for (const QString &parca : parcalar) {
+            int ikiNoktaIdx = parca.indexOf(":");
+            if (ikiNoktaIdx != -1) {
+                QString key = parca.left(ikiNoktaIdx).trimmed();
+                QString val = parca.mid(ikiNoktaIdx + 1).trimmed();
+                ozellikHaritasi[key] = val;
+            }
+        }
+    }
+
     // ── Düzenleme Popup'ı ──
     QDialog *dialog = new QDialog(this);
     dialog->setWindowTitle("İlanı Düzenle");
-    dialog->setMinimumWidth(440);
+    dialog->setMinimumSize(480, 580);
+    dialog->resize(500, 660);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setStyleSheet(
         "QDialog { background-color: #f9fafb; }"
@@ -168,9 +184,30 @@ void Profil::on_btnIlanDuzenle_clicked()
         "  border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; font-size: 10pt; }"
         "QLabel { color: #000000; font-weight: bold; font-size: 10pt; }");
 
-    QVBoxLayout *anaLayout = new QVBoxLayout(dialog);
+    // Dialog layout holding the scroll area and the pinned bottom action bar
+    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
+    dialogLayout->setContentsMargins(0, 0, 0, 0);
+    dialogLayout->setSpacing(0);
+
+    QScrollArea *mainScroll = new QScrollArea(dialog);
+    mainScroll->setWidgetResizable(true);
+    mainScroll->setStyleSheet("QScrollArea { border: none; background-color: #f9fafb; }");
+
+    QWidget *scrollContent = new QWidget();
+    scrollContent->setStyleSheet("background-color: #f9fafb;");
+    QVBoxLayout *anaLayout = new QVBoxLayout(scrollContent);
     anaLayout->setSpacing(12);
-    anaLayout->setContentsMargins(20, 20, 20, 20);
+    anaLayout->setContentsMargins(20, 20, 20, 10);
+    mainScroll->setWidget(scrollContent);
+    dialogLayout->addWidget(mainScroll, 1);
+
+    // Fixed bottom bar for Save / Cancel buttons
+    QWidget *bottomBar = new QWidget(dialog);
+    bottomBar->setStyleSheet("background-color: #f9fafb; border-top: 1px solid #e5e7eb;");
+    QHBoxLayout *butonLayout = new QHBoxLayout(bottomBar);
+    butonLayout->setSpacing(12);
+    butonLayout->setContentsMargins(20, 12, 20, 15);
+    dialogLayout->addWidget(bottomBar);
 
     anaLayout->addWidget(new QLabel("Başlık:"));
     QLineEdit *txtBaslik = new QLineEdit(mevcutBaslik);
@@ -191,6 +228,80 @@ void Profil::on_btnIlanDuzenle_clicked()
         "border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; }"
         "QComboBox QAbstractItemView { background-color: white; color: #000000; }");
     anaLayout->addWidget(cmbKategori);
+
+    // Özellikler için dinamik layout
+    QVBoxLayout *ozellikLayout = new QVBoxLayout();
+    anaLayout->addLayout(ozellikLayout);
+
+    QMap<QString, QLineEdit*> ozellikEditleri;
+
+    auto temizleOzellikler = [ozellikLayout, &ozellikEditleri]() {
+        QLayoutItem *child;
+        while ((child = ozellikLayout->takeAt(0)) != nullptr) {
+            if (child->widget()) {
+                delete child->widget();
+                delete child;
+            } else if (child->layout()) {
+                QLayout *subLayout = child->layout();
+                QLayoutItem *subchild;
+                while ((subchild = subLayout->takeAt(0)) != nullptr) {
+                    if (subchild->widget()) {
+                        delete subchild->widget();
+                    }
+                    delete subchild;
+                }
+                delete subLayout;
+            } else {
+                delete child;
+            }
+        }
+        ozellikEditleri.clear();
+    };
+
+    auto guncelleOzellikler = [=, &ozellikEditleri, &ozellikHaritasi](const QString &kategori) {
+        temizleOzellikler();
+
+        QStringList ozellikler;
+        if (kategori == "Emlak") {
+            ozellikler << "Bina Yaşı" << "Metrekare" << "Oda Sayısı" << "Bulunduğu Kat" << "Konum (İl/İlçe)" << "Isıtma Tipi" << "Balkon (Var/Yok)";
+        } else if (kategori == "Vasıta") {
+            ozellikler << "Marka" << "Model" << "Yıl" << "Kilometre" << "Yakıt Tipi" << "Vites Tipi" << "Hasar Kaydı (TL)";
+        } else if (kategori == "Elektronik") {
+            ozellikler << "Marka" << "Model" << "Renk" << "Durum (Sıfır/İkinci El)" << "Garanti (Var/Yok)" << "Fatura (Var/Yok)" << "Kutu (Var/Yok)";
+        } else if (kategori == "Giyim") {
+            ozellikler << "Marka" << "Beden" << "Renk" << "Durum" << "Kumaş Tipi" << "Cinsiyet" << "Kullanım Türü";
+        }
+
+        if (!ozellikler.isEmpty()) {
+            QLabel *lblOzelBaslik = new QLabel("<b>" + kategori + " Özellikleri:</b>");
+            lblOzelBaslik->setStyleSheet("color: #0078D7; font-size: 10pt; margin-top: 5px;");
+            ozellikLayout->addWidget(lblOzelBaslik);
+
+            for (const QString &oz : ozellikler) {
+                QHBoxLayout *hLayout = new QHBoxLayout();
+                QLabel *lbl = new QLabel(oz + ":");
+                lbl->setStyleSheet("font-weight: normal; font-size: 9pt;");
+                
+                QString deger = (kategori == mevcutKategori) ? ozellikHaritasi.value(oz) : "";
+                QLineEdit *txt = new QLineEdit(deger);
+                txt->setStyleSheet("QLineEdit { background-color: white; color: #000000; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px; }");
+
+                hLayout->addWidget(lbl);
+                hLayout->addWidget(txt);
+                ozellikLayout->addLayout(hLayout);
+
+                ozellikEditleri[oz] = txt;
+            }
+        }
+    };
+
+    // İlk kategoriye göre alanları yükle
+    guncelleOzellikler(cmbKategori->currentText());
+
+    // Kategori değiştikçe alanları güncelle
+    connect(cmbKategori, &QComboBox::currentTextChanged, dialog, [=, &ozellikEditleri, &ozellikHaritasi](const QString &kat) {
+        guncelleOzellikler(kat);
+    });
 
     anaLayout->addWidget(new QLabel("Açıklama:"));
     QTextEdit *txtAciklama = new QTextEdit(mevcutAciklama);
@@ -262,7 +373,6 @@ void Profil::on_btnIlanDuzenle_clicked()
     }
 
     // Kaydet / İptal
-    QHBoxLayout *butonLayout = new QHBoxLayout();
     QPushButton *btnKaydet = new QPushButton("💾 Kaydet");
     QPushButton *btnIptal  = new QPushButton("✖ İptal");
     btnKaydet->setMinimumHeight(38);
@@ -275,11 +385,10 @@ void Profil::on_btnIlanDuzenle_clicked()
         "QPushButton:hover { background-color: #6b7280; }");
     butonLayout->addWidget(btnKaydet);
     butonLayout->addWidget(btnIptal);
-    anaLayout->addLayout(butonLayout);
 
     connect(btnIptal, &QPushButton::clicked, dialog, &QDialog::reject);
 
-    connect(btnKaydet, &QPushButton::clicked, dialog, [=, &secilenFotolar]() mutable {
+    connect(btnKaydet, &QPushButton::clicked, dialog, [=, &secilenFotolar, &ozellikEditleri]() mutable {
         QString yeniBaslik   = txtBaslik->text().trimmed();
         QString yeniFiyatStr = txtFiyat->text().trimmed();
         QString yeniKategori = cmbKategori->currentText();
@@ -296,10 +405,20 @@ void Profil::on_btnIlanDuzenle_clicked()
             return;
         }
 
+        // Değiştirilen özellikleri metin formatına dönüştür
+        QStringList ozellikList;
+        for (auto it = ozellikEditleri.begin(); it != ozellikEditleri.end(); ++it) {
+            if (!it.value()->text().isEmpty()) {
+                ozellikList << it.key() + ": " + it.value()->text();
+            }
+        }
+        QString yeniOzelliklerStr = ozellikList.join(" | ");
+
         QSqlQuery guncelle(DatabaseManager::getInstance()->getDatabase());
         guncelle.prepare("UPDATE Ilan SET baslik = :b, fiyat = :f, kategori = :k, "
                          "aciklama = :a, stokAdedi = :stok, "
-                         "foto1 = :f1, foto2 = :f2, foto3 = :f3, foto4 = :f4, foto5 = :f5 "
+                         "foto1 = :f1, foto2 = :f2, foto3 = :f3, foto4 = :f4, foto5 = :f5, "
+                         "ozellikler = :ozel "
                          "WHERE ilanNo = :id");
         guncelle.bindValue(":b",    yeniBaslik);
         guncelle.bindValue(":f",    yeniFiyat);
@@ -311,6 +430,7 @@ void Profil::on_btnIlanDuzenle_clicked()
         guncelle.bindValue(":f3",   secilenFotolar[2]);
         guncelle.bindValue(":f4",   secilenFotolar[3]);
         guncelle.bindValue(":f5",   secilenFotolar[4]);
+        guncelle.bindValue(":ozel", yeniOzelliklerStr);
         guncelle.bindValue(":id",   ilanNo);
 
         if (guncelle.exec()) {
